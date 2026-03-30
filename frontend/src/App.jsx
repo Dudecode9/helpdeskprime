@@ -1,10 +1,11 @@
 import { Routes, Route } from "react-router-dom";
-import { useState } from "react"; // ← ЭТО ВАЖНО!
+import { useState } from "react";
+
 import HomePage from "./pages/HomePage";
 import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import UserPage from "./pages/UserPage";
-
+import DirectorDashboard from "./pages/DirectorDashboard"; // ← добавили
 
 function App() {
   const [count, setCount] = useState(0);
@@ -15,6 +16,7 @@ function App() {
       <Route path="/admin" element={<h2>Admin Page</h2>} />
       <Route path="/admin-login" element={<AdminLogin />} />
       <Route path="/admin-dashboard" element={<AdminDashboard />} />
+      <Route path="/director-dashboard" element={<DirectorDashboard />} /> {/* ← добавили */}
       <Route path="/user" element={<UserPage />} />
     </Routes>
   );

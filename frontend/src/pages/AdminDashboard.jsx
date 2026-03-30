@@ -1,8 +1,16 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function AdminDashboard() {
   const [tickets, setTickets] = useState([]);
   const [completed, setCompleted] = useState([]);
+
+  // --- ДЛЯ МОДАЛЬНОГО ОКНА ДИРЕКТОРА ---
+  const [showDirectorModal, setShowDirectorModal] = useState(false);
+  const [directorPassword, setDirectorPassword] = useState("");
+  const [directorError, setDirectorError] = useState("");
+  const navigate = useNavigate();
+  // -------------------------------------
 
   // Загружаем активные заявки
   async function loadTickets() {
@@ -36,13 +44,37 @@ export default function AdminDashboard() {
     const data = await res.json();
 
     if (data.success) {
-      // 1. Удаляем из активных
       setTickets((prev) => prev.filter((t) => t.id !== id));
-
-      // 2. Перезагружаем закрытые заявки
       loadCompleted();
     }
   }
+
+  // --- ЛОГИН ДИРЕКТОРА ---
+  async function handleDirectorLogin() {
+    setDirectorError("");
+
+    const res = await fetch("http://localhost:5000/api/director/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: "director@gmail.com", // тот, что ты создал в createDirector.js
+        password: directorPassword,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      setDirectorError("Неверный пароль");
+      return;
+    }
+
+    // Успех
+    localStorage.setItem("director", "true");
+    setShowDirectorModal(false);
+    navigate("/director-dashboard");
+  }
+  // ------------------------
 
   return (
     <div style={{ padding: 40 }}>
@@ -72,6 +104,83 @@ export default function AdminDashboard() {
           <p><b>Закрыто администратором:</b> {ticket.admin_email}</p>
         </div>
       ))}
+
+      {/* КНОПКА ВХОДА ДИРЕКТОРА */}
+      <button
+        onClick={() => setShowDirectorModal(true)}
+        style={{
+          marginTop: 30,
+          padding: "10px 20px",
+          background: "#333",
+          color: "white",
+          borderRadius: 8,
+          cursor: "pointer"
+        }}
+      >
+        Вход директора
+      </button>
+
+      {/* МОДАЛЬНОЕ ОКНО */}
+      {showDirectorModal && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          width: "100%",
+          height: "100%",
+          background: "rgba(0,0,0,0.5)",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center"
+        }}>
+          <div style={{
+            background: "white",
+            padding: 30,
+            borderRadius: 10,
+            width: 350
+          }}>
+            <h3>Введите пароль директора</h3>
+
+            <input
+              type="password"
+              placeholder="Пароль"
+              value={directorPassword}
+              onChange={(e) => setDirectorPassword(e.target.value)}
+              style={{ width: "100%", padding: 10, marginTop: 10 }}
+            />
+
+            {directorError && <p style={{ color: "red" }}>{directorError}</p>}
+
+            <div style={{ marginTop: 20, display: "flex", gap: 10 }}>
+              <button
+                onClick={handleDirectorLogin}
+                style={{
+                  flex: 1,
+                  padding: "10px 15px",
+                  background: "#333",
+                  color: "white",
+                  borderRadius: 6
+                }}
+              >
+                Войти
+              </button>
+
+              <button
+                onClick={() => setShowDirectorModal(false)}
+                style={{
+                  flex: 1,
+                  padding: "10px 15px",
+                  background: "#aaa",
+                  color: "white",
+                  borderRadius: 6
+                }}
+              >
+                Отмена
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
