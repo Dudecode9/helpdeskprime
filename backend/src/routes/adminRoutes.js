@@ -1,10 +1,17 @@
 import express from "express";
-import { registerAdmin } from "../controllers/adminController.js";
-import { adminLogin } from "../controllers/adminController.js";
+import {
+  adminLogin,
+  registerAdmin,
+  getAdmins,
+  changeAdminPassword
+} from "../controllers/adminController.js";
 
 const router = express.Router();
 
-router.post("/register", registerAdmin);
 router.post("/login", adminLogin);
+router.post("/register", registerAdmin);
+router.get("/all", getAdmins);
+router.post("/create", registerAdmin); // директор создаёт админа
+router.post("/update-password", changeAdminPassword);
 
 export default router;

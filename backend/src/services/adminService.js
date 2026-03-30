@@ -36,3 +36,23 @@ export async function loginAdmin(email, password) {
 
   return { id: admin.id, email: admin.email };
 }
+
+// Получить всех админов
+export async function getAllAdmins() {
+  const result = await pool.query(
+    "SELECT id, email FROM admins ORDER BY id ASC"
+  );
+  return result.rows;
+}
+
+// Обновить пароль админа
+export async function updateAdminPassword(email, newPassword) {
+  const hashed = await bcrypt.hash(newPassword, 10);
+
+  const result = await pool.query(
+    "UPDATE admins SET password = $1 WHERE email = $2 RETURNING id, email",
+    [hashed, email]
+  );
+
+  return result.rows[0];
+}

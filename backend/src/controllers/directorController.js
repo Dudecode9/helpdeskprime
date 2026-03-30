@@ -1,4 +1,8 @@
-import { registerDirector, loginDirector } from "../services/directorService.js";
+import {
+  registerDirector,
+  loginDirector,
+  updateDirectorPassword
+} from "../services/directorService.js";
 
 // Регистрация директора
 export async function directorRegister(req, res) {
@@ -27,5 +31,23 @@ export async function directorLogin(req, res) {
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Login failed" });
+  }
+}
+
+// 🔥 Смена пароля директора
+export async function changeDirectorPassword(req, res) {
+  const { newPassword } = req.body;
+
+  try {
+    const director = await updateDirectorPassword(newPassword);
+
+    if (!director) {
+      return res.json({ success: false, message: "Director not found" });
+    }
+
+    res.json({ success: true, director });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Password update failed" });
   }
 }

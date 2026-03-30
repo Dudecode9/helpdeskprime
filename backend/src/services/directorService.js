@@ -28,3 +28,15 @@ export async function loginDirector(email, password) {
 
   return director;
 }
+
+// 🔥 Смена пароля директора
+export async function updateDirectorPassword(newPassword) {
+  const hashed = await bcrypt.hash(newPassword, 10);
+
+  const result = await pool.query(
+    "UPDATE directordev SET password = $1 WHERE email = 'director@gmail.com' RETURNING id, email",
+    [hashed]
+  );
+
+  return result.rows[0];
+}

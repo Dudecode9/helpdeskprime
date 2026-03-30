@@ -2,24 +2,38 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function AdminDashboard() {
+  const navigate = useNavigate();
+
+  // 🔥 МГНОВЕННАЯ ЗАЩИТА ДО РЕНДЕРА
+  const adminEmail = localStorage.getItem("adminEmail");
+  const director = localStorage.getItem("director");
+
+  if (director) {
+    navigate("/director-dashboard");
+    return null;
+  }
+
+  if (!adminEmail) {
+    navigate("/");
+    return null;
+  }
+
+  // --- ЕСЛИ МЫ ЗДЕСЬ — АДМИН ТОЧНО АВТОРИЗОВАН ---
   const [tickets, setTickets] = useState([]);
   const [completed, setCompleted] = useState([]);
 
-  // --- ДЛЯ МОДАЛЬНОГО ОКНА ДИРЕКТОРА ---
   const [showDirectorModal, setShowDirectorModal] = useState(false);
   const [directorPassword, setDirectorPassword] = useState("");
   const [directorError, setDirectorError] = useState("");
-  const navigate = useNavigate();
-  // -------------------------------------
 
-  // Загружаем активные заявки
+  // Загрузка активных заявок
   async function loadTickets() {
     const res = await fetch("http://localhost:5000/api/tickets/all");
     const data = await res.json();
     if (data.success) setTickets(data.tickets);
   }
 
-  // Загружаем закрытые заявки
+  // Загрузка закрытых заявок
   async function loadCompleted() {
     const res = await fetch("http://localhost:5000/api/tickets/completed");
     const data = await res.json();
@@ -33,8 +47,6 @@ export default function AdminDashboard() {
 
   // Закрыть заявку
   async function closeTicket(id) {
-    const adminEmail = localStorage.getItem("adminEmail") || "admin@gmail.com";
-
     const res = await fetch(`http://localhost:5000/api/tickets/close/${id}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -49,7 +61,7 @@ export default function AdminDashboard() {
     }
   }
 
-  // --- ЛОГИН ДИРЕКТОРА ---
+  // ЛОГИН ДИРЕКТОРА
   async function handleDirectorLogin() {
     setDirectorError("");
 
@@ -57,7 +69,7 @@ export default function AdminDashboard() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        email: "director@gmail.com", // тот, что ты создал в createDirector.js
+        email: "director@gmail.com",
         password: directorPassword,
       }),
     });
@@ -69,16 +81,42 @@ export default function AdminDashboard() {
       return;
     }
 
-    // Успех
     localStorage.setItem("director", "true");
     setShowDirectorModal(false);
     navigate("/director-dashboard");
   }
-  // ------------------------
+
+  // 🔥 ВЫХОД АДМИНА
+  function logoutAdmin() {
+    localStorage.removeItem("adminEmail");
+    localStorage.removeItem("admin");
+    navigate("/");
+  }
 
   return (
     <div style={{ padding: 40 }}>
-      <h1>Активные заявки</h1>
+      <h1>Панель администратора</h1>
+
+      {/* 🔥 Информация о текущем аккаунте */}
+      <p style={{ marginBottom: 20, fontSize: 18 }}>
+        <b>Вы вошли как:</b> {adminEmail}
+      </p>
+
+      <button
+        onClick={logoutAdmin}
+        style={{
+          padding: "8px 16px",
+          background: "#444",
+          color: "white",
+          borderRadius: 6,
+          cursor: "pointer",
+          marginBottom: 30
+        }}
+      >
+        Выйти
+      </button>
+
+      <h2>Активные заявки</h2>
 
       {tickets.map((ticket) => (
         <div key={ticket.id} style={{ border: "1px solid #ccc", padding: 10, marginBottom: 10 }}>
@@ -94,7 +132,7 @@ export default function AdminDashboard() {
 
       <hr />
 
-      <h1>Закрытые заявки</h1>
+      <h2>Закрытые заявки</h2>
 
       {completed.map((ticket) => (
         <div key={ticket.id} style={{ border: "1px solid #aaa", padding: 10, marginBottom: 10 }}>
@@ -105,7 +143,6 @@ export default function AdminDashboard() {
         </div>
       ))}
 
-      {/* КНОПКА ВХОДА ДИРЕКТОРА */}
       <button
         onClick={() => setShowDirectorModal(true)}
         style={{
@@ -120,7 +157,6 @@ export default function AdminDashboard() {
         Вход директора
       </button>
 
-      {/* МОДАЛЬНОЕ ОКНО */}
       {showDirectorModal && (
         <div style={{
           position: "fixed",

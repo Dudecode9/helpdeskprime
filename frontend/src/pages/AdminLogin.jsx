@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function AdminLogin() {
@@ -7,8 +7,16 @@ export default function AdminLogin() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  // Если админ уже залогинен → в админку
+  useEffect(() => {
+    if (localStorage.getItem("adminEmail")) {
+      navigate("/admin-dashboard");
+    }
+  }, [navigate]);
+
   async function handleLogin(e) {
     e.preventDefault();
+    setError("");
 
     const res = await fetch("http://localhost:5000/api/admin/login", {
       method: "POST",
@@ -17,20 +25,15 @@ export default function AdminLogin() {
     });
 
     const data = await res.json();
-    console.log(data);
 
     if (!data.success) {
       setError(data.message);
       return;
     }
 
-    // Сохраняем email администратора
     localStorage.setItem("adminEmail", email);
-
-    // Флаг авторизации
     localStorage.setItem("admin", "true");
 
-    // Переход в админ-панель
     navigate("/admin-dashboard");
   }
 
