@@ -7,9 +7,14 @@ export default function AdminLogin() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // Если админ уже залогинен → в админку
+  // Если админ или директор уже залогинен → редирект
   useEffect(() => {
-    if (localStorage.getItem("adminEmail")) {
+    const adminEmail = localStorage.getItem("adminEmail");
+    const director = localStorage.getItem("director");
+
+    if (director) {
+      navigate("/director-dashboard");
+    } else if (adminEmail) {
       navigate("/admin-dashboard");
     }
   }, [navigate]);

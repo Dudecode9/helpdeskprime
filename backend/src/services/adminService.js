@@ -56,3 +56,13 @@ export async function updateAdminPassword(email, newPassword) {
 
   return result.rows[0];
 }
+
+// 🔥 Удалить администратора
+export async function deleteAdmin(email) {
+  const result = await pool.query(
+    "DELETE FROM admins WHERE email = $1 RETURNING id, email",
+    [email]
+  );
+
+  return result.rows[0];
+}

@@ -12,12 +12,11 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/admin" element={<h2>Admin Page</h2>} />
-      <Route path="/admin-login" element={<AdminLogin />} />
-      <Route path="/admin-dashboard" element={<AdminDashboard />} />
-      <Route path="/director-dashboard" element={<DirectorDashboard />} /> {/* ← добавили */}
-      <Route path="/user" element={<UserPage />} />
+  <Route path="/" element={<HomePage />} />
+  <Route path="/admin-login" element={<AdminLogin />} />
+  <Route path="/admin-dashboard" element={<AdminDashboard />} />
+  <Route path="/director-dashboard" element={<DirectorDashboard />} />
+  <Route path="/user" element={<UserPage />} />
     </Routes>
   );
 }

@@ -4,17 +4,20 @@ import { useNavigate } from "react-router-dom";
 export default function AdminDashboard() {
   const navigate = useNavigate();
 
-  // 🔥 МГНОВЕННАЯ ЗАЩИТА ДО РЕНДЕРА
   const adminEmail = localStorage.getItem("adminEmail");
   const director = localStorage.getItem("director");
 
-  if (director) {
-    navigate("/director-dashboard");
-    return null;
-  }
+  // 🔥 Правильная защита — только через useEffect
+  useEffect(() => {
+    if (director) {
+      navigate("/director-dashboard");
+    } else if (!adminEmail) {
+      navigate("/admin-login");
+    }
+  }, [navigate, director, adminEmail]);
 
-  if (!adminEmail) {
-    navigate("/");
+  // Пока идёт редирект — ничего не рендерим
+  if (director || !adminEmail) {
     return null;
   }
 
@@ -90,14 +93,13 @@ export default function AdminDashboard() {
   function logoutAdmin() {
     localStorage.removeItem("adminEmail");
     localStorage.removeItem("admin");
-    navigate("/");
+    navigate("/admin-login");
   }
 
   return (
     <div style={{ padding: 40 }}>
       <h1>Панель администратора</h1>
 
-      {/* 🔥 Информация о текущем аккаунте */}
       <p style={{ marginBottom: 20, fontSize: 18 }}>
         <b>Вы вошли как:</b> {adminEmail}
       </p>

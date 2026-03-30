@@ -59,3 +59,32 @@ export async function completeTicket(id, adminEmail) {
 
   return { success: true };
 }
+
+// 🔥 Очистить ВСЕ закрытые заявки
+export async function clearCompletedTickets() {
+  await pool.query("DELETE FROM completed_tickets");
+  return { success: true };
+}
+
+// 🔥 Вернуть закрытую заявку обратно в активные
+export async function restoreCompletedTicket(id) {
+  const result = await pool.query(
+    "SELECT * FROM completed_tickets WHERE id = $1",
+    [id]
+  );
+
+  const ticket = result.rows[0];
+  if (!ticket) throw new Error("Completed ticket not found");
+
+  // Вставляем обратно в активные заявки
+  await pool.query(
+    `INSERT INTO tickets (email, phone, message, created_at)
+     VALUES ($1, $2, $3, $4)`,
+    [ticket.email, ticket.phone, ticket.message, ticket.created_at]
+  );
+
+  // Удаляем из completed_tickets
+  await pool.query("DELETE FROM completed_tickets WHERE id = $1", [id]);
+
+  return { success: true };
+}

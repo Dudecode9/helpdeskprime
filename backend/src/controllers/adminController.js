@@ -2,7 +2,8 @@ import {
   createAdmin,
   loginAdmin,
   getAllAdmins,
-  updateAdminPassword
+  updateAdminPassword,
+  deleteAdmin
 } from "../services/adminService.js";
 
 // ЛОГИН АДМИНА
@@ -53,5 +54,22 @@ export async function changeAdminPassword(req, res) {
     res.json({ success: true, admin });
   } catch (err) {
     res.status(500).json({ success: false, message: "Ошибка обновления пароля" });
+  }
+}
+
+// 🔥 УДАЛИТЬ АДМИНА
+export async function deleteAdminController(req, res) {
+  const { email } = req.body;
+
+  try {
+    const deleted = await deleteAdmin(email);
+
+    if (!deleted) {
+      return res.json({ success: false, message: "Админ не найден" });
+    }
+
+    res.json({ success: true, deleted });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Ошибка удаления админа" });
   }
 }

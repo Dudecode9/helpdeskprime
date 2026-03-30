@@ -3,7 +3,9 @@ import {
   createTicket, 
   getAllTickets, 
   completeTicket,
-  getCompletedTickets
+  getCompletedTickets,
+  clearCompletedTickets,
+  restoreCompletedTicket
 } from "../services/ticketService.js";
 
 // Создать заявку
@@ -48,6 +50,30 @@ export async function closeTicket(req, res) {
 
   try {
     const result = await completeTicket(id, adminEmail);
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: err.message });
+  }
+}
+
+// Очистить все закрытые заявки
+export async function clearCompleted(req, res) {
+  try {
+    await clearCompletedTickets();
+    res.json({ success: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Failed to clear completed tickets" });
+  }
+}
+
+// 🔥 Вернуть закрытую заявку в активные
+export async function restoreCompleted(req, res) {
+  const { id } = req.params;
+
+  try {
+    const result = await restoreCompletedTicket(id);
     res.json(result);
   } catch (err) {
     console.error(err);
