@@ -1,0 +1,45 @@
+.home-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: #f5f7fa;
+  font-family: Arial, sans-serif;
+}
+
+h1 {
+  margin-bottom: 40px;
+  font-size: 32px;
+  color: #333;
+}
+
+.button-group {
+  display: flex;
+  gap: 20px;
+}
+
+.home-btn {
+  padding: 14px 28px;
+  font-size: 18px;
+  text-decoration: none;
+  border-radius: 8px;
+  color: white;
+  transition: 0.2s;
+}
+
+.user-btn {
+  background: #007bff;
+}
+
+.user-btn:hover {
+  background: #0056b3;
+}
+
+.admin-btn {
+  background: #28a745;
+}
+
+.admin-btn:hover {
+  background: #1e7e34;
+}
