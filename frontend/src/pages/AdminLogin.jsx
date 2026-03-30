@@ -17,11 +17,16 @@ export default function AdminLogin() {
     });
 
     const data = await res.json();
+    console.log(data);
 
     if (!data.success) {
       setError(data.message);
       return;
     }
+    //флаг авторизации блять!!!
+    localStorage.setItem("admin", "true");
+
+    
 
     // Успешный вход → перенаправляем в админ-панель
     navigate("/admin-dashboard");

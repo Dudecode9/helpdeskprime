@@ -7,3 +7,10 @@ export async function createTicket(email, phone, message) {
   );
   return result.rows[0];
 }
+
+export async function getAllTickets() {
+  const result = await pool.query(
+    "SELECT * FROM tickets ORDER BY created_at DESC"
+  );
+  return result.rows;
+}
