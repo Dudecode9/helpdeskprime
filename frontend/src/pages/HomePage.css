@@ -1,45 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600&family=Poppins:wght@300;400;600&display=swap');
+
+body {
+  margin: 0;
+  background: #0c0c0c;
+  color: white;
+  font-family: "Poppins", sans-serif;
+}
+
 .home-container {
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background: #f5f7fa;
-  font-family: Arial, sans-serif;
+  text-align: center;
+  padding: 60px 20px;
+  animation: fadeIn 0.8s ease-out;
 }
 
-h1 {
+/* Шапка */
+.header {
+  background: #111;
+  padding: 20px 0;
+  font-size: 34px;
+  font-family: "Oswald", sans-serif;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  border-radius: 12px;
   margin-bottom: 40px;
-  font-size: 32px;
-  color: #333;
+  border: 1px solid #222;
+  box-shadow: 0 0 25px rgba(255, 0, 0, 0.25);
+  position: relative;
 }
 
+/* Неоновая линия */
+.header::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 3px;
+  background: #d00000;
+  box-shadow: 0 0 12px #d00000;
+  border-radius: 2px;
+}
+
+/* Заголовок */
+.title {
+  font-family: "Oswald", sans-serif;
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin-bottom: 50px;
+  color: #d00000;
+  position: relative;
+}
+
+/* Глитч эффект */
+.glitch {
+  animation: glitch 1.8s infinite;
+}
+
+@keyframes glitch {
+  0% { text-shadow: 2px 2px #d00000; }
+  20% { text-shadow: -2px -2px #d00000; }
+  40% { text-shadow: 2px -2px #d00000; }
+  60% { text-shadow: -2px 2px #d00000; }
+  80% { text-shadow: 0 0 8px #d00000; }
+  100% { text-shadow: 2px 2px #d00000; }
+}
+
+/* Группа кнопок */
 .button-group {
   display: flex;
-  gap: 20px;
+  flex-direction: column;
+  gap: 22px;
+  max-width: 320px;
+  margin: 0 auto;
+  animation: slideUp 0.9s ease-out;
 }
 
+/* Кнопки */
 .home-btn {
-  padding: 14px 28px;
-  font-size: 18px;
+  display: block;
+  padding: 16px 0;
+  border-radius: 10px;
+  font-size: 22px;
+  font-family: "Oswald", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
   text-decoration: none;
-  border-radius: 8px;
   color: white;
-  transition: 0.2s;
+  transition: 0.25s;
+  border: 1px solid #333;
+  background: #141414;
+  box-shadow: 0 0 18px rgba(0,0,0,0.6);
 }
 
-.user-btn {
-  background: #007bff;
+/* Hover эффект */
+.home-btn:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 0 15px rgba(255,0,0,0.4);
 }
 
+/* Пользователь */
 .user-btn:hover {
-  background: #0056b3;
+  background: #222;
 }
 
+/* Администратор */
 .admin-btn {
-  background: #28a745;
+  background: #d00000;
+  border: none;
 }
 
 .admin-btn:hover {
-  background: #1e7e34;
+  background: #ff1a1a;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
 }
