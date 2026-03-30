@@ -23,12 +23,14 @@ export default function AdminLogin() {
       setError(data.message);
       return;
     }
-    //флаг авторизации блять!!!
+
+    // Сохраняем email администратора
+    localStorage.setItem("adminEmail", email);
+
+    // Флаг авторизации
     localStorage.setItem("admin", "true");
 
-    
-
-    // Успешный вход → перенаправляем в админ-панель
+    // Переход в админ-панель
     navigate("/admin-dashboard");
   }
 

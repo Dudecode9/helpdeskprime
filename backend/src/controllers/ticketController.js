@@ -1,5 +1,12 @@
-import { createTicket, getAllTickets } from "../services/ticketService.js";
+// src/controllers/ticketController.js
+import { 
+  createTicket, 
+  getAllTickets, 
+  completeTicket,
+  getCompletedTickets
+} from "../services/ticketService.js";
 
+// Создать заявку
 export async function submitTicket(req, res) {
   const { email, phone, message } = req.body;
 
@@ -12,6 +19,7 @@ export async function submitTicket(req, res) {
   }
 }
 
+// Получить активные заявки
 export async function fetchTickets(req, res) {
   try {
     const tickets = await getAllTickets();
@@ -19,5 +27,30 @@ export async function fetchTickets(req, res) {
   } catch (err) {
     console.error(err);
     res.status(500).json({ success: false, message: "Failed to load tickets" });
+  }
+}
+
+// Получить закрытые заявки
+export async function fetchCompletedTickets(req, res) {
+  try {
+    const tickets = await getCompletedTickets();
+    res.json({ success: true, tickets });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Failed to load completed tickets" });
+  }
+}
+
+// Закрыть заявку
+export async function closeTicket(req, res) {
+  const { id } = req.params;
+  const { adminEmail } = req.body;
+
+  try {
+    const result = await completeTicket(id, adminEmail);
+    res.json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: err.message });
   }
 }

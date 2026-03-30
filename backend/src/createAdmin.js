@@ -2,8 +2,8 @@ import bcrypt from "bcrypt";
 import { pool } from "./config/db.js";
 
 async function createAdmin() {
-  const email = "admin@gmail.com";
-  const password = "123456";
+  const email = "admin7@gmail.com";
+  const password = "1234567";
 
   const hashed = await bcrypt.hash(password, 10);
 
