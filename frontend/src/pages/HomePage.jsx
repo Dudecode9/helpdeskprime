@@ -7,36 +7,36 @@ import "./HomePage.css";
 const features = [
   {
     index: "01",
-    title: "Официальный и аккуратный подход",
-    text: "Главная страница выстроена как серьёзный лендинг услуг: понятный оффер, чистая структура и деловая логика без визуального шума.",
+    title: "Заявки по окнам",
+    text: "Принимаем обращения по замеру, установке, замене и сервису окон.",
   },
   {
     index: "02",
-    title: "Фирменный персонаж без потери доверия",
-    text: "Нурик остаётся лицом бренда и помогает сайту запоминаться, но юмор встроен деликатно и не спорит с бизнес-задачей.",
+    title: "Короткая форма",
+    text: "Нужны только контакты и краткое описание вопроса.",
   },
   {
     index: "03",
-    title: "URL-медиа вместо тяжёлых ассетов",
-    text: "Фотографии подключаются по ссылкам, поэтому визуал можно менять гибко, а проект и сервер не страдают от перегруженных файлов.",
+    title: "Отдельный личный запрос",
+    text: "Нурлан открыт к серьёзному знакомству и ищет достойную жену.",
   },
 ];
 
 const services = [
   {
-    title: "Установка пластиковых окон",
-    text: "Услуга подаётся строго и понятно, с акцентом на качество, прозрачный путь клиента и уверенное первое впечатление.",
-    points: ["Профессиональная подача сервиса", "Понятные CTA и блоки доверия", "Баланс имиджа и пользы"],
+    title: "Пластиковые окна",
+    text: "Замер, установка, замена, расчёт стоимости.",
+    points: ["Замер", "Установка", "Замена", "Консультация"],
   },
   {
-    title: "Замер и расчёт стоимости",
-    text: "Блоки выстроены так, чтобы пользователь быстро понимал, что делать дальше и как начинается диалог с компанией.",
-    points: ["Понятный сценарий обращения", "Спокойный деловой тон", "Минимум лишних шагов"],
+    title: "Сервисный вопрос",
+    text: "Можно оставить запрос по существующим окнам или уточнить условия работ.",
+    points: ["Сроки", "Стоимость", "Состояние окон"],
   },
   {
-    title: "Бренд с человеческим лицом",
-    text: "Фирменный образ Нурика добавляет характер, но визуальный стиль остаётся официальным и профессиональным.",
-    points: ["Характер без цирка", "Запоминаемость без потери лица", "Тёплая, но взрослая подача"],
+    title: "Знакомство с Нурланом",
+    text: "Если цель обращения личная, это тоже можно указать в заявке.",
+    points: ["Серьёзный формат", "Уважительное общение", "Без лишней публичности"],
   },
 ];
 
@@ -44,40 +44,35 @@ const workflow = [
   {
     step: "1",
     title: "Оставить заявку",
-    text: "Клиент оставляет контакты и описание задачи через уже существующую форму.",
+    text: "Укажите контакты и коротко опишите цель обращения.",
   },
   {
     step: "2",
-    title: "Уточнить детали",
-    text: "Коммуникация начинается в понятной и официальной рамке без путаницы в сценариях.",
+    title: "Дождаться ответа",
+    text: "После просмотра заявки будет обратная связь.",
   },
   {
     step: "3",
-    title: "Подготовить решение",
-    text: "Структура лендинга усиливает доверие к услуге и ведёт пользователя к действию.",
-  },
-  {
-    step: "4",
-    title: "Сохранить качество",
-    text: "Редизайн меняет подачу, но не ломает роутинг, авторизацию и текущую бизнес-логику.",
+    title: "Перейти к делу",
+    text: "По окнам — замер и расчёт. По знакомству — дальнейшее общение.",
   },
 ];
 
 const reviews = [
   {
-    title: "Солидно и читаемо",
-    text: "Сайт выглядит современно и уверенно, при этом сохраняет характер бренда и ощущение живой компании.",
-    person: "Оценка пользовательского восприятия",
+    title: "Строгая подача",
+    text: "Текст стал короче и спокойнее. Сайт выглядит собранно.",
+    person: "Публичная часть",
   },
   {
-    title: "Характер на месте",
-    text: "Нурик остаётся запоминающимся образом, но теперь работает как брендовый акцент, а не как визуальный шум.",
-    person: "Позиционирование бренда",
+    title: "Понятная цель",
+    text: "Сразу ясно, что сюда можно написать по окнам или обратиться к Нурлану лично.",
+    person: "Структура сайта",
   },
   {
-    title: "Функционал не тронут",
-    text: "Все ключевые действия остаются на прежних маршрутах, а текущая логика API и валидации не меняется.",
-    person: "Техническая безопасность редизайна",
+    title: "Без лишнего шума",
+    text: "Минимум рекламных формулировок и больше конкретики.",
+    person: "Тон страницы",
   },
 ];
 
@@ -95,7 +90,7 @@ function MediaCard({ media, className, badgeText }) {
       )}
       {badgeText ? (
         <div className="floating-badge">
-          <strong>Позиционирование</strong>
+          <strong>Нурлан</strong>
           <span>{badgeText}</span>
         </div>
       ) : null}
@@ -125,12 +120,12 @@ export default function HomePage() {
           <div className="brand-lockup">
             <div className="brand-badge">Н</div>
             <div className="brand-copy">
-              <p className="brand-title">Нурик Пласт Окна</p>
-              <p className="brand-subtitle">Официальный сервис по установке пластиковых окон с фирменным характером</p>
+              <p className="brand-title">Нурлан Окна</p>
+              <p className="brand-subtitle">Заявки по окнам и отдельный канал для знакомства</p>
             </div>
           </div>
           <div className="header-actions">
-            <div className="header-note">3 фотографии достаточно, если у каждой есть точная роль</div>
+            <div className="header-note">Строго. Коротко. По делу.</div>
             <Link to="/admin-login" className="ghost-button">
               Вход для сотрудников
             </Link>
@@ -139,33 +134,34 @@ export default function HomePage() {
 
         <section className="hero">
           <div className="hero-card">
-            <span className="eyebrow">Новый публичный стиль</span>
+            <span className="eyebrow">Приём обращений</span>
             <h1 className="hero-title">
-              Пластиковые окна <span>с серьёзной подачей</span> и узнаваемым лицом бренда
+              Окна, сервис и <span>обратная связь</span> без лишнего текста
             </h1>
             <p className="hero-description">
-              Главная страница перестраивается в официальный и профессиональный лендинг: с чётким оффером, сильной структурой, читаемыми блоками и аккуратным фирменным акцентом на образе Нурика.
+              Через сайт можно оставить заявку по окнам: замер, установка, замена, консультация. Отдельно Нурлан
+              рассматривает серьёзное знакомство и ищет достойную жену.
             </p>
             <div className="hero-actions">
               <Link to="/user" className="primary-button">
                 Оставить заявку
               </Link>
               <a href="#services" className="secondary-button">
-                Посмотреть услуги
+                Что можно отправить
               </a>
             </div>
             <div className="hero-points">
               <div className="hero-point">
-                <strong>3 фото</strong>
-                <span>Hero, деловой блок доверия и фирменный завершающий акцент</span>
+                <strong>Окна</strong>
+                <span>Замер, установка, расчёт, сервис</span>
               </div>
               <div className="hero-point">
-                <strong>0</strong>
-                <span>Изменений в API, маршрутах, обработчиках и валидации</span>
+                <strong>Знакомство</strong>
+                <span>Отдельная заявка для Нурлана</span>
               </div>
               <div className="hero-point">
-                <strong>URL</strong>
-                <span>Внешние медиа без тяжёлой загрузки в проект и без нагрузки на сервер</span>
+                <strong>Форма</strong>
+                <span>Короткое и понятное обращение</span>
               </div>
             </div>
           </div>
@@ -174,20 +170,20 @@ export default function HomePage() {
             <MediaCard
               media={hero}
               className="hero-photo-card"
-              badgeText="Нурик остаётся узнаваемым персонажем, но визуальная система теперь работает как взрослый сервисный продукт."
+              badgeText="Ищет достойную, порядочную жену и открыт к серьёзному знакомству."
             />
             <div className="glass-panel">
               <div className="metric-card">
                 <span className="metric-value">Строго</span>
-                <span className="metric-label">Основной тон первого экрана и ключевых действий</span>
+                <span className="metric-label">Сдержанный тон и короткие блоки</span>
               </div>
               <div className="metric-card">
-                <span className="metric-value">Тепло</span>
-                <span className="metric-label">Характер бренда и мягкий юмор в нужных местах</span>
+                <span className="metric-value">Ясно</span>
+                <span className="metric-label">Сразу понятно, зачем сюда обращаться</span>
               </div>
               <div className="metric-card">
-                <span className="metric-value">Надёжно</span>
-                <span className="metric-label">Редизайн не вмешивается в существующую бизнес-логику</span>
+                <span className="metric-value">Лично</span>
+                <span className="metric-label">Есть отдельный акцент на Нурлане</span>
               </div>
             </div>
           </div>
@@ -195,10 +191,10 @@ export default function HomePage() {
 
         <section className="section">
           <div className="section-header">
-            <p className="section-kicker">Основа концепции</p>
-            <h2 className="section-title">Сайт должен выглядеть как серьёзная услуга, а не как случайная шутка</h2>
+            <p className="section-kicker">Формат</p>
+            <h2 className="section-title">Сайт объясняет задачу быстро и без перегруза</h2>
             <p className="section-description">
-              Поэтому юмор остаётся как брендовая подпись, а не как главная конструкция интерфейса. Каркас сайта решает деловую задачу: вызвать доверие и привести к заявке.
+              Это рабочая страница для тех, кому нужно написать по окнам или обратиться к Нурлану лично.
             </p>
           </div>
           <div className="feature-grid">
@@ -214,11 +210,8 @@ export default function HomePage() {
 
         <section className="section" id="services">
           <div className="section-header">
-            <p className="section-kicker">Услуги</p>
-            <h2 className="section-title">Подача услуг становится чище, солиднее и понятнее</h2>
-            <p className="section-description">
-              Публичная часть сайта должна объяснять, чем занимается компания, как выглядит процесс и почему клиенту удобно доверить ей работу.
-            </p>
+            <p className="section-kicker">Темы обращений</p>
+            <h2 className="section-title">Через форму можно отправить один из трёх типов заявок</h2>
           </div>
           <div className="service-grid">
             {services.map((service) => (
@@ -237,24 +230,25 @@ export default function HomePage() {
 
         <section className="section">
           <div className="section-header">
-            <p className="section-kicker">О компании</p>
-            <h2 className="section-title">Второе фото работает на доверие, а не на перегрузку</h2>
+            <p className="section-kicker">О Нурлане</p>
+            <h2 className="section-title">Нурлан работает с окнами и ищет достойную жену</h2>
             <p className="section-description">
-              Вместо большой галереи мы используем один уверенный деловой визуальный блок, который поддерживает историю компании, качество работы и чувство надёжности.
+              Личный блок оставлен открыто, но спокойно и без лишней театральности.
             </p>
           </div>
           <div className="story-grid">
             <article className="story-card">
               <div className="story-copy">
-                <span className="eyebrow">Фото №2</span>
-                <h3 className="section-title">Роль второго кадра: усилить доверие к компании и её подаче</h3>
+                <span className="eyebrow">Личный блок</span>
+                <h3 className="section-title">Серьёзно и уважительно</h3>
                 <p className="story-text">
-                  Это место для спокойной, уверенной фотографии. Она может сопровождать блок о подходе, опыте, качестве сервиса и профессиональной дисциплине.
+                  Нурлан подаётся как реальный человек: занимается окнами, держит деловой тон и открыт к знакомству с
+                  достойной, порядочной женщиной.
                 </p>
                 <ul className="note-list">
-                  <li>Подходит для секции “О компании” или “Почему выбирают нас”.</li>
-                  <li>Не конкурирует с первым экраном, а укрепляет впечатление.</li>
-                  <li>Сохраняет взрослый визуальный ритм страницы.</li>
+                  <li>Серьёзное знакомство, а не случайная переписка.</li>
+                  <li>Спокойный и уважительный формат обращения.</li>
+                  <li>Один канал связи через форму заявки.</li>
                 </ul>
               </div>
               <div className="story-photo-wrap">
@@ -271,11 +265,11 @@ export default function HomePage() {
             </article>
 
             <aside className="story-side-panel">
-              <h3>Как распределяем 3 фотографии</h3>
+              <h3>Когда сюда пишут</h3>
               <ul className="note-list">
-                <li>Фото 1: формирует первое впечатление и атмосферу сайта.</li>
-                <li>Фото 2: помогает деловому блоку и усиливает доверие.</li>
-                <li>Фото 3: завершает образ бренда и даёт характерный штрих.</li>
+                <li>Нужно заказать окна или вызвать замер.</li>
+                <li>Нужно уточнить стоимость и условия работ.</li>
+                <li>Есть цель познакомиться с Нурланом для серьёзных отношений.</li>
               </ul>
             </aside>
           </div>
@@ -283,11 +277,8 @@ export default function HomePage() {
 
         <section className="section">
           <div className="section-header">
-            <p className="section-kicker">Как мы работаем</p>
-            <h2 className="section-title">Маршрут клиента остаётся прямым и понятным</h2>
-            <p className="section-description">
-              Это важно не только визуально. Новый стиль строится вокруг того, чтобы пользователь быстрее ориентировался, а мы не трогали уже работающие сценарии.
-            </p>
+            <p className="section-kicker">Как это работает</p>
+            <h2 className="section-title">Маршрут посетителя короткий и понятный</h2>
           </div>
           <div className="timeline">
             {workflow.map((item) => (
@@ -302,8 +293,8 @@ export default function HomePage() {
 
         <section className="section">
           <div className="section-header">
-            <p className="section-kicker">Отзывы и позиционирование</p>
-            <h2 className="section-title">Новый стиль усиливает продукт, а не подменяет его собой</h2>
+            <p className="section-kicker">Оценка подачи</p>
+            <h2 className="section-title">Публичная часть стала строже и яснее</h2>
           </div>
           <div className="review-grid">
             {reviews.map((review) => (
@@ -318,19 +309,20 @@ export default function HomePage() {
 
         <section className="section">
           <div className="section-header">
-            <p className="section-kicker">Фирменный акцент</p>
-            <h2 className="section-title">Третье фото оставляем для характерного, но всё ещё серьёзного финала</h2>
+            <p className="section-kicker">Финальный акцент</p>
+            <h2 className="section-title">Лицо сайта остаётся узнаваемым</h2>
             <p className="section-description">
-              Здесь уже можно чуть сильнее показать личность бренда. Но и этот блок продолжает общий стиль: официальный, собранный и аккуратный.
+              Сайт остаётся рабочим сервисом, но при этом прямо говорит о личном запросе Нурлана.
             </p>
           </div>
           <div className="story-grid">
             <article className="story-card">
               <div className="story-copy">
-                <span className="eyebrow">Фото №3</span>
-                <h3 className="section-title">Нурик как узнаваемое лицо бренда, а не случайный мем-элемент</h3>
+                <span className="eyebrow">Финальный блок</span>
+                <h3 className="section-title">Окна, ответственность и серьёзные намерения</h3>
                 <p className="story-text">
-                  Финальный акцент помогает запомнить сайт, но не разрушает доверие. Это взрослое брендирование с характером, а не карикатура на услугу.
+                  Нурлан открыт к знакомству и ищет достойную жену. Если цель обращения личная, это можно указать прямо
+                  в заявке.
                 </p>
               </div>
               <div className="story-photo-wrap">
@@ -347,11 +339,11 @@ export default function HomePage() {
             </article>
 
             <aside className="story-side-panel">
-              <h3>Почему функционал не страдает</h3>
+              <h3>Что не меняется</h3>
               <ul className="note-list">
-                <li>Маршруты `/user` и `/admin-login` не меняются.</li>
-                <li>Редирект авторизованных пользователей остаётся прежним.</li>
-                <li>Никакие вызовы `apiFetch`, проверки и роли не переписываются.</li>
+                <li>Маршруты `/user` и `/admin-login` остаются прежними.</li>
+                <li>API и логика формы не ломаются.</li>
+                <li>Публичная часть стала короче и строже.</li>
               </ul>
             </aside>
           </div>
@@ -359,10 +351,8 @@ export default function HomePage() {
 
         <section className="cta-panel">
           <div>
-            <h2 className="cta-title">Следом переводим форму заявки и страницу входа в тот же официальный визуальный язык</h2>
-            <p className="cta-text">
-              Так публичный путь станет цельным: серьёзная главная, аккуратная форма заявки и такой же спокойный экран авторизации без конфликтов с текущей логикой.
-            </p>
+            <h2 className="cta-title">Если вопрос по окнам или есть цель познакомиться, можно написать сразу</h2>
+            <p className="cta-text">Форма одна, сценарии понятны, текста ровно столько, сколько нужно.</p>
           </div>
           <div className="cta-actions">
             <Link to="/user" className="primary-button">

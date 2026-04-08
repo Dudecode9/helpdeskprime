@@ -67,7 +67,7 @@ export default function AdminLogin() {
           <Link to="/" className="public-back-link">
             ← Вернуться на главную
           </Link>
-          <div className="header-note">Сохраняем текущую схему авторизации и обновляем только визуальную подачу</div>
+          <div className="header-note">Служебный вход для сотрудников</div>
         </div>
 
         <section className="public-panel">
@@ -77,17 +77,13 @@ export default function AdminLogin() {
               <div className="public-aside-content">
                 <span className="eyebrow">Служебный доступ</span>
                 <h2>Вход для сотрудников и администрации</h2>
-                <p>
-                  Экран авторизации выдержан в том же официальном стиле, что и главная. Чисто, спокойно и без перегруза, чтобы не мешать рабочему сценарию входа.
-                </p>
+                <p>Закрытая часть для обработки заявок и внутренней работы с обращениями.</p>
               </div>
             </aside>
 
             <div className="public-content">
               <h2>Авторизация</h2>
-              <p>
-                Используйте рабочие учётные данные для входа. Логика проверки, входа, обновления сессии и редиректов сохраняется полностью.
-              </p>
+              <p>Используйте рабочие учётные данные для входа в административную часть.</p>
 
               <form onSubmit={handleLogin} className="public-form">
                 <div className="form-row">

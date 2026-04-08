@@ -42,7 +42,7 @@ export default function UserPage() {
         },
         skipRefresh: true,
       });
-      setSuccess("Заявка успешно отправлена. Мы свяжемся с вами после уточнения деталей.");
+      setSuccess("Заявка отправлена. Мы свяжемся с вами после просмотра обращения.");
       setEmail("");
       setPhone("");
       setMessage("");
@@ -60,7 +60,7 @@ export default function UserPage() {
           <Link to="/" className="public-back-link">
             ← Вернуться на главную
           </Link>
-          <div className="header-note">Сохраняем текущую логику формы и обновляем только внешний слой</div>
+          <div className="header-note">Форма для заявок по окнам и личного обращения к Нурлану</div>
         </div>
 
         <section className="public-panel">
@@ -69,18 +69,14 @@ export default function UserPage() {
               {hasMedia(requestMedia.url) ? <img src={requestMedia.url} alt={requestMedia.alt} /> : null}
               <div className="public-aside-content">
                 <span className="eyebrow">Приём заявок</span>
-                <h1>Оставьте заявку на консультацию или расчёт</h1>
-                <p>
-                  Спокойная деловая форма без лишнего визуального шума. Пользователь понимает, что сделать дальше, а функционал отправки остаётся прежним.
-                </p>
+                <h1>Оставьте заявку по окнам или сообщение для Нурлана</h1>
+                <p>Короткая форма для замера, установки, консультации по окнам или для серьёзного знакомства.</p>
               </div>
             </aside>
 
             <div className="public-content">
               <h2>Связаться с нами</h2>
-              <p>
-                Оставьте контакты и кратко опишите задачу. Редизайн не меняет API-запрос, валидацию и маршрут страницы, поэтому бизнес-логика остаётся стабильной.
-              </p>
+              <p>Укажите контакты и кратко напишите, о чём обращение: окна, сервис, расчёт или знакомство.</p>
 
               <form onSubmit={handleSubmit} className="public-form">
                 <div className="form-row">
@@ -112,11 +108,11 @@ export default function UserPage() {
                 </div>
 
                 <div className="form-row">
-                  <label htmlFor="ticket-message">Описание задачи</label>
+                  <label htmlFor="ticket-message">Описание обращения</label>
                   <textarea
                     id="ticket-message"
                     maxLength={1000}
-                    placeholder="Кратко опишите задачу, чтобы мы быстрее сориентировались"
+                    placeholder="Коротко: окна, сервис, расчёт или серьёзное знакомство"
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     disabled={submitting}
