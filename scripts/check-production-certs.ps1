@@ -1,11 +1,34 @@
 param(
-    [string]$CertDir = ".\infra\certs"
+    [string]$CertDir = "",
+    [string]$EnvFile = ".\.env.production"
 )
 
 $ErrorActionPreference = "Stop"
 
 $projectRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
-$resolvedCertDir = Join-Path $projectRoot $CertDir
+$resolvedCertDir = $null
+
+if ([string]::IsNullOrWhiteSpace($CertDir) -and (Test-Path (Join-Path $projectRoot $EnvFile))) {
+    $tlsSourceLine = Get-Content (Join-Path $projectRoot $EnvFile) |
+        Where-Object { $_ -match '^TLS_SOURCE_DIR=' } |
+        Select-Object -First 1
+
+    if ($tlsSourceLine) {
+        $CertDir = ($tlsSourceLine -split '=', 2)[1].Trim()
+    }
+}
+
+if ([string]::IsNullOrWhiteSpace($CertDir)) {
+    $CertDir = ".\infra\certs"
+}
+
+if ([System.IO.Path]::IsPathRooted($CertDir)) {
+    $resolvedCertDir = $CertDir
+}
+else {
+    $resolvedCertDir = Join-Path $projectRoot $CertDir
+}
+
 $fullchainPath = Join-Path $resolvedCertDir "fullchain.pem"
 $privkeyPath = Join-Path $resolvedCertDir "privkey.pem"
 

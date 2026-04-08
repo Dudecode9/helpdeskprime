@@ -59,11 +59,13 @@ powershell -ExecutionPolicy Bypass -File .\scripts\start-production.ps1
 
 ## Notes
 
-- `docker-compose.production.yml` expects certificates under `infra/certs/`
+- `docker-compose.production.yml` can mount certificates directly from `TLS_SOURCE_DIR`
+- recommended on VPS: `TLS_SOURCE_DIR=/etc/letsencrypt/live/your-domain.example`
+- local fallback: keep certificates under `infra/certs/`
 - use `.env.production.example` as the base for production environment values
-- required certificate filenames:
-  - `infra/certs/fullchain.pem`
-  - `infra/certs/privkey.pem`
+- required mounted certificate filenames inside the container:
+  - `/etc/nginx/certs/fullchain.pem`
+  - `/etc/nginx/certs/privkey.pem`
 - for a lightweight production monitoring loop, use `scripts/monitoring-mvp.ps1`
 - the latest versioned health endpoint is `GET /api/v1/health`
 - legacy `/api/...` routes remain available for backward compatibility

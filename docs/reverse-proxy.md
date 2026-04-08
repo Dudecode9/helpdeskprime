@@ -29,12 +29,13 @@ HTTPS mode is now prepared through the nginx template system.
 
 To enable it:
 
-1. Put certificates into `infra/certs/`
-   - `fullchain.pem`
-   - `privkey.pem`
+1. Choose where certificates come from
+   - recommended on VPS: mount Let's Encrypt directly with `TLS_SOURCE_DIR=/etc/letsencrypt/live/your-domain.example`
+   - local/manual fallback: put `fullchain.pem` and `privkey.pem` into `infra/certs/`
 2. Use production environment values
    - `ENABLE_HTTPS=true`
    - `APP_DOMAIN=your-domain.example`
+   - `TLS_SOURCE_DIR=/etc/letsencrypt/live/your-domain.example`
 3. Start with:
 
 ```powershell
@@ -46,3 +47,15 @@ Or:
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\start-production.ps1
 ```
+
+## Recommended VPS setup
+
+For a real server with Let's Encrypt:
+
+- obtain certificates for your domain with `certbot`
+- set `TLS_SOURCE_DIR=/etc/letsencrypt/live/your-domain.example`
+- keep:
+  - `TLS_CERT_PATH=/etc/nginx/certs/fullchain.pem`
+  - `TLS_KEY_PATH=/etc/nginx/certs/privkey.pem`
+
+The production compose file will mount that directory into the nginx container automatically.
