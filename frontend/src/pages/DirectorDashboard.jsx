@@ -6,16 +6,25 @@ import {
   validateAdminMutationForm,
   validatePasswordForm,
 } from "../utils/validation";
+import "./Dashboard.css";
+
+function cn(...classes) {
+  return classes.filter(Boolean).join(" ");
+}
 
 function getErrorMessage(error) {
   const validationError = error?.data?.errors?.[0]?.message;
-  return validationError || error?.message || "Request failed";
+  return validationError || error?.message || "Не удалось выполнить запрос";
 }
 
-function Modal({ children }) {
+function Modal({ title, text, children }) {
   return (
-    <div style={modalBg}>
-      <div style={modalBox}>{children}</div>
+    <div className="dashboard-modal-backdrop">
+      <div className="dashboard-modal">
+        <h3 className="dashboard-modal-title">{title}</h3>
+        {text ? <p className="dashboard-modal-text">{text}</p> : null}
+        {children}
+      </div>
     </div>
   );
 }
@@ -30,13 +39,20 @@ function formatDate(value) {
 
 function PaginationControls({ page, totalPages, onChange }) {
   return (
-    <div style={paginationStyle}>
-      <button onClick={() => onChange(page - 1)} disabled={page <= 1} style={buttonSecondary}>
-        Prev
+    <div className="dashboard-pagination">
+      <button type="button" onClick={() => onChange(page - 1)} disabled={page <= 1} className="dashboard-button dashboard-button-secondary">
+        Назад
       </button>
-      <span style={mutedText}>Page {page} / {totalPages}</span>
-      <button onClick={() => onChange(page + 1)} disabled={page >= totalPages} style={buttonSecondary}>
-        Next
+      <span className="dashboard-muted">
+        Страница {page} из {totalPages}
+      </span>
+      <button
+        type="button"
+        onClick={() => onChange(page + 1)}
+        disabled={page >= totalPages}
+        className="dashboard-button dashboard-button-secondary"
+      >
+        Вперёд
       </button>
     </div>
   );
@@ -179,7 +195,7 @@ export default function DirectorDashboard() {
 
   async function changePassword() {
     try {
-      const validationError = validatePasswordForm(newPassword, "New password");
+      const validationError = validatePasswordForm(newPassword, "Новый пароль");
 
       if (validationError) {
         setError(validationError);
@@ -254,7 +270,7 @@ export default function DirectorDashboard() {
 
   async function changeDirectorPassword() {
     try {
-      const validationError = validatePasswordForm(directorNewPassword, "Director password");
+      const validationError = validatePasswordForm(directorNewPassword, "Пароль директора");
 
       if (validationError) {
         setError(validationError);
@@ -280,240 +296,419 @@ export default function DirectorDashboard() {
     navigate("/admin-login");
   }
 
+  async function refreshDirectorView() {
+    await refreshDashboard();
+  }
+
   return (
-    <div style={container}>
-      <h1 style={title}>Director Dashboard</h1>
-      {error && <p style={{ color: "#ef4444" }}>{error}</p>}
-
-      <div style={topGrid}>
-        <div style={panel}>
-          <h2 style={subtitle}>Users Online</h2>
-          {onlineUsers.length === 0 ? (
-            <p style={emptyMessage}>No active users right now</p>
-          ) : (
-            onlineUsers.map((user) => (
-              <div key={user.id} style={listCard}>
-                <p style={cardText}><b>{user.email}</b> ({user.role})</p>
-                <p style={mutedText}>Login: {formatDate(user.login_at)}</p>
-                <p style={mutedText}>Last seen: {formatDate(user.last_seen_at)}</p>
-                <p style={mutedText}>IP: {user.ip || "unknown"}</p>
-              </div>
-            ))
-          )}
-        </div>
-
-        <div style={panel}>
-          <h2 style={subtitle}>Recent Activity</h2>
-          <div style={filtersRow}>
-            <input
-              placeholder="Actor email"
-              value={auditEmailFilter}
-              onChange={(e) => setAuditEmailFilter(e.target.value)}
-              style={input}
-            />
-            <select value={auditStatusFilter} onChange={(e) => setAuditStatusFilter(e.target.value)} style={input}>
-              <option value="">All statuses</option>
-              <option value="success">success</option>
-              <option value="failed">failed</option>
-            </select>
+    <div className="dashboard-page">
+      <div className="dashboard-shell">
+        <header className="dashboard-header">
+          <div className="dashboard-brand">
+            <p className="dashboard-kicker">Панель директора</p>
+            <h1 className="dashboard-title">Управление администраторами, историей и активностью</h1>
+            <p className="dashboard-subtitle">
+              Кабинет перестроен визуально в том же официальном стиле, но все рабочие действия и запросы к API оставлены без изменения.
+            </p>
           </div>
-          {auditLogs.length === 0 ? (
-            <p style={emptyMessage}>No logs yet</p>
-          ) : (
-            auditLogs.map((log) => (
-              <div key={log.id} style={listCard}>
-                <p style={cardText}>
-                  <b>{log.event_type}</b> [{log.status}]
-                </p>
-                <p style={cardText}>{log.message}</p>
-                <p style={mutedText}>
-                  {log.actor_email || "system"} {log.actor_role ? `(${log.actor_role})` : ""}
-                </p>
-                <p style={mutedText}>{formatDate(log.created_at)}</p>
-              </div>
-            ))
-          )}
-          <PaginationControls
-            page={auditMeta.page}
-            totalPages={auditMeta.totalPages}
-            onChange={(page) => loadAuditLogs(page, auditEmailFilter, auditStatusFilter)}
-          />
-        </div>
-      </div>
+          <div className="dashboard-actions">
+            <button type="button" onClick={refreshDirectorView} className="dashboard-button dashboard-button-soft">
+              Обновить данные
+            </button>
+            <button type="button" onClick={() => setShowAddModal(true)} className="dashboard-button dashboard-button-primary">
+              Добавить администратора
+            </button>
+            <button type="button" onClick={logoutDirector} className="dashboard-button dashboard-button-danger">
+              Выйти
+            </button>
+          </div>
+        </header>
 
-      <div style={twoColumns}>
-        <div style={leftColumn}>
-          <h2 style={subtitle}>Admins</h2>
-          {admins.map((admin) => (
-            <div key={admin.id} style={card}>
-              <p style={cardText}><b>Email:</b> {admin.email}</p>
-              <div style={cardActions}>
-                <button onClick={() => { setSelectedEmail(admin.email); setShowChangeModal(true); }} style={buttonSecondary}>
-                  Change Password
-                </button>
-                <button onClick={() => { setSelectedEmail(admin.email); setShowDeleteModal(true); }} style={{ ...buttonSecondary, backgroundColor: "#b91c1c" }}>
-                  Delete
+        {error ? <p className="dashboard-error">{error}</p> : null}
+
+        <section className="dashboard-stats-grid">
+          <article className="dashboard-stat">
+            <span className="dashboard-stat-value">{admins.length}</span>
+            <span className="dashboard-stat-label">Администраторов в системе</span>
+          </article>
+          <article className="dashboard-stat">
+            <span className="dashboard-stat-value">{onlineUsers.length}</span>
+            <span className="dashboard-stat-label">Пользователей онлайн прямо сейчас</span>
+          </article>
+          <article className="dashboard-stat">
+            <span className="dashboard-stat-value">{auditLogs.length}</span>
+            <span className="dashboard-stat-label">Записей активности на текущей странице</span>
+          </article>
+        </section>
+
+        <div className="dashboard-top-grid" style={{ marginTop: 20 }}>
+          <section className="dashboard-panel">
+            <h2 className="dashboard-panel-title">Пользователи онлайн</h2>
+            <div className="dashboard-scroll">
+              {onlineUsers.length === 0 ? (
+                <p className="dashboard-empty">Сейчас нет активных пользователей.</p>
+              ) : (
+                onlineUsers.map((user) => (
+                  <article key={user.id} className="dashboard-card">
+                    <h3 className="dashboard-card-title">
+                      {user.email} <span className="dashboard-inline-label">({user.role})</span>
+                    </h3>
+                    <p className="dashboard-text">Вход: {formatDate(user.login_at)}</p>
+                    <p className="dashboard-text">Последняя активность: {formatDate(user.last_seen_at)}</p>
+                    <p className="dashboard-text">IP: {user.ip || "неизвестно"}</p>
+                  </article>
+                ))
+              )}
+            </div>
+          </section>
+
+          <section className="dashboard-panel">
+            <div className="dashboard-toolbar">
+              <div className="dashboard-brand" style={{ gap: 6 }}>
+                <p className="dashboard-kicker">Активность</p>
+                <h2 className="dashboard-panel-title" style={{ marginBottom: 0 }}>
+                  Журнал действий
+                </h2>
+                <p className="dashboard-caption">Фильтры вынесены в верхнюю панель, чтобы журнал было легче просматривать в рабочем ритме.</p>
+              </div>
+              <div className="dashboard-toolbar-group">
+                <input
+                  placeholder="Email участника"
+                  value={auditEmailFilter}
+                  onChange={(e) => setAuditEmailFilter(e.target.value)}
+                  className="dashboard-input dashboard-input-inline"
+                />
+                <select
+                  value={auditStatusFilter}
+                  onChange={(e) => setAuditStatusFilter(e.target.value)}
+                  className="dashboard-select dashboard-select-inline"
+                >
+                  <option value="">Все статусы</option>
+                  <option value="success">success</option>
+                  <option value="failed">failed</option>
+                </select>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuditEmailFilter("");
+                    setAuditStatusFilter("");
+                  }}
+                  className="dashboard-button dashboard-button-soft"
+                >
+                  Сбросить фильтры
                 </button>
               </div>
             </div>
-          ))}
 
-          <div style={buttonGroup}>
-            <button onClick={() => setShowAddModal(true)} style={buttonPrimary}>Add Admin</button>
-            <button onClick={() => setShowDirectorPasswordModal(true)} style={buttonSecondary}>Change Director Password</button>
-            <button onClick={() => setShowClearModal(true)} style={{ ...buttonSecondary, backgroundColor: "#b91c1c" }}>Clear Completed</button>
-            <button onClick={logoutDirector} style={buttonSecondary}>Logout</button>
-          </div>
-        </div>
-
-        <div style={rightColumn}>
-          <h2 style={subtitle}>Completed Tickets</h2>
-          <input
-            placeholder="Filter completed by email"
-            value={completedEmailFilter}
-            onChange={(e) => setCompletedEmailFilter(e.target.value)}
-            style={input}
-          />
-          <div style={ticketsList}>
-            {completed.length === 0 ? (
-              <p style={emptyMessage}>No completed tickets</p>
-            ) : (
-              completed.map((ticket) => {
-                const expanded = expandedTickets[ticket.id];
-                const isLong = ticket.message.length > 100;
-                const text = expanded || !isLong ? ticket.message : `${ticket.message.slice(0, 100)}...`;
-                return (
-                  <div key={ticket.id} style={card}>
-                    <p style={cardText}><b>Email:</b> {ticket.email}</p>
-                    <p style={cardText}><b>Phone:</b> {ticket.phone}</p>
-                    <p style={cardText}>
-                      <b>Message:</b> {text}
-                      {isLong && (
-                        <button
-                          onClick={() => setExpandedTickets((prev) => ({ ...prev, [ticket.id]: !prev[ticket.id] }))}
-                          style={toggleButton}
-                        >
-                          {expanded ? "Collapse" : "Show full"}
-                        </button>
-                      )}
+            <div className="dashboard-scroll">
+              {auditLogs.length === 0 ? (
+                <p className="dashboard-empty">Журнал пока пуст.</p>
+              ) : (
+                auditLogs.map((log) => (
+                  <article key={log.id} className="dashboard-log">
+                    <div className="dashboard-card-header">
+                      <h3 className="dashboard-card-title">{log.event_type}</h3>
+                      <span
+                        className={cn(
+                          "dashboard-badge",
+                          log.status === "success" ? "dashboard-badge-success" : "dashboard-badge-failed",
+                        )}
+                      >
+                        {log.status}
+                      </span>
+                    </div>
+                    <p className="dashboard-text">{log.message}</p>
+                    <p className="dashboard-text">
+                      {log.actor_email || "system"} {log.actor_role ? `(${log.actor_role})` : ""}
                     </p>
-                    <p style={cardText}><b>Closed by:</b> {ticket.admin_email}</p>
-                    <button
-                      onClick={() => restoreTicket(ticket.id)}
-                      disabled={actionLoading === `restore-${ticket.id}`}
-                      style={{ ...buttonPrimary, ...(actionLoading === `restore-${ticket.id}` ? disabledButton : {}) }}
-                    >
-                      {actionLoading === `restore-${ticket.id}` ? "Restoring..." : "Restore"}
-                    </button>
-                  </div>
-                );
-              })
-            )}
-          </div>
-          <PaginationControls
-            page={completedMeta.page}
-            totalPages={completedMeta.totalPages}
-            onChange={(page) => loadCompleted(page, completedEmailFilter)}
-          />
+                    <p className="dashboard-text">{formatDate(log.created_at)}</p>
+                  </article>
+                ))
+              )}
+            </div>
+            <PaginationControls
+              page={auditMeta.page}
+              totalPages={auditMeta.totalPages}
+              onChange={(page) => loadAuditLogs(page, auditEmailFilter, auditStatusFilter)}
+            />
+          </section>
         </div>
+
+        <div className="dashboard-split" style={{ marginTop: 20 }}>
+          <section className="dashboard-panel">
+            <div className="dashboard-row" style={{ alignItems: "center", marginBottom: 14 }}>
+              <h2 className="dashboard-panel-title" style={{ marginBottom: 0 }}>
+                Администраторы
+              </h2>
+              <div className="dashboard-actions">
+                <button type="button" onClick={() => setShowDirectorPasswordModal(true)} className="dashboard-button dashboard-button-secondary">
+                  Сменить пароль директора
+                </button>
+                <button type="button" onClick={() => setShowClearModal(true)} className="dashboard-button dashboard-button-danger">
+                  Очистить завершённые
+                </button>
+              </div>
+            </div>
+
+            <div className="dashboard-scroll">
+              {admins.length === 0 ? (
+                <p className="dashboard-empty">Администраторы не найдены.</p>
+              ) : (
+                admins.map((admin) => (
+                  <article key={admin.id} className="dashboard-card">
+                    <h3 className="dashboard-card-title">{admin.email}</h3>
+                    <div className="dashboard-actions-row">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedEmail(admin.email);
+                          setShowChangeModal(true);
+                        }}
+                        className="dashboard-button dashboard-button-secondary"
+                      >
+                        Сменить пароль
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedEmail(admin.email);
+                          setShowDeleteModal(true);
+                        }}
+                        className="dashboard-button dashboard-button-danger"
+                      >
+                        Удалить
+                      </button>
+                    </div>
+                  </article>
+                ))
+              )}
+            </div>
+          </section>
+
+          <section className="dashboard-panel">
+            <div className="dashboard-toolbar">
+              <div className="dashboard-brand" style={{ gap: 6 }}>
+                <p className="dashboard-kicker">История</p>
+                <h2 className="dashboard-panel-title" style={{ marginBottom: 0 }}>
+                  Завершённые заявки
+                </h2>
+                <p className="dashboard-caption">Восстановление заявки остаётся доступным, а длинные сообщения можно раскрывать точечно.</p>
+              </div>
+              <div className="dashboard-toolbar-group">
+                <input
+                  placeholder="Фильтр по email"
+                  value={completedEmailFilter}
+                  onChange={(e) => setCompletedEmailFilter(e.target.value)}
+                  className="dashboard-input dashboard-input-inline"
+                />
+                <button
+                  type="button"
+                  onClick={() => setCompletedEmailFilter("")}
+                  className="dashboard-button dashboard-button-soft"
+                >
+                  Сбросить
+                </button>
+              </div>
+            </div>
+
+            <div className="dashboard-scroll">
+              {completed.length === 0 ? (
+                <p className="dashboard-empty">Нет завершённых заявок.</p>
+              ) : (
+                completed.map((ticket) => {
+                  const expanded = expandedTickets[ticket.id];
+                  const isLong = ticket.message.length > 100;
+                  const text = expanded || !isLong ? ticket.message : `${ticket.message.slice(0, 100)}...`;
+
+                  return (
+                    <article key={ticket.id} className="dashboard-ticket">
+                      <h3 className="dashboard-card-title">{ticket.email}</h3>
+                      <p className="dashboard-text">Телефон: {ticket.phone}</p>
+                      <p className="dashboard-text">
+                        Сообщение: {text}
+                        {isLong ? (
+                          <button
+                            type="button"
+                            onClick={() => setExpandedTickets((prev) => ({ ...prev, [ticket.id]: !prev[ticket.id] }))}
+                            className="dashboard-button dashboard-button-soft"
+                            style={{ marginTop: 10 }}
+                          >
+                            {expanded ? "Свернуть" : "Показать полностью"}
+                          </button>
+                        ) : null}
+                      </p>
+                      <p className="dashboard-text">Закрыто: {ticket.admin_email}</p>
+                      <div className="dashboard-actions-row">
+                        <button
+                          type="button"
+                          onClick={() => restoreTicket(ticket.id)}
+                          disabled={actionLoading === `restore-${ticket.id}`}
+                          className="dashboard-button dashboard-button-primary"
+                        >
+                          {actionLoading === `restore-${ticket.id}` ? "Восстановление..." : "Восстановить"}
+                        </button>
+                      </div>
+                    </article>
+                  );
+                })
+              )}
+            </div>
+            <PaginationControls
+              page={completedMeta.page}
+              totalPages={completedMeta.totalPages}
+              onChange={(page) => loadCompleted(page, completedEmailFilter)}
+            />
+          </section>
+        </div>
+
+        {showAddModal ? (
+          <Modal title="Добавить администратора" text="Создайте новую учётную запись администратора. Логика создания остаётся прежней.">
+            <input
+              type="email"
+              placeholder="Email"
+              value={newAdminEmail}
+              onChange={(e) => setNewAdminEmail(e.target.value)}
+              disabled={actionLoading === "add-admin"}
+              className="dashboard-input"
+            />
+            <div style={{ height: 10 }} />
+            <input
+              type="password"
+              placeholder="Пароль"
+              value={newAdminPassword}
+              onChange={(e) => setNewAdminPassword(e.target.value)}
+              disabled={actionLoading === "add-admin"}
+              className="dashboard-input"
+            />
+            <div className="dashboard-modal-actions">
+              <button
+                type="button"
+                onClick={addAdmin}
+                disabled={actionLoading === "add-admin"}
+                className="dashboard-button dashboard-button-primary"
+              >
+                {actionLoading === "add-admin" ? "Создание..." : "Создать"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowAddModal(false)}
+                disabled={actionLoading === "add-admin"}
+                className="dashboard-button dashboard-button-secondary"
+              >
+                Отмена
+              </button>
+            </div>
+          </Modal>
+        ) : null}
+
+        {showChangeModal ? (
+          <Modal title="Изменить пароль администратора" text={selectedEmail}>
+            <input
+              type="password"
+              placeholder="Новый пароль"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              disabled={actionLoading === "change-admin-password"}
+              className="dashboard-input"
+            />
+            <div className="dashboard-modal-actions">
+              <button
+                type="button"
+                onClick={changePassword}
+                disabled={actionLoading === "change-admin-password"}
+                className="dashboard-button dashboard-button-primary"
+              >
+                {actionLoading === "change-admin-password" ? "Сохранение..." : "Сохранить"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowChangeModal(false)}
+                disabled={actionLoading === "change-admin-password"}
+                className="dashboard-button dashboard-button-secondary"
+              >
+                Отмена
+              </button>
+            </div>
+          </Modal>
+        ) : null}
+
+        {showDeleteModal ? (
+          <Modal title="Удалить администратора" text={selectedEmail}>
+            <div className="dashboard-modal-actions">
+              <button
+                type="button"
+                onClick={deleteAdmin}
+                disabled={actionLoading === "delete-admin"}
+                className="dashboard-button dashboard-button-danger"
+              >
+                {actionLoading === "delete-admin" ? "Удаление..." : "Удалить"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={actionLoading === "delete-admin"}
+                className="dashboard-button dashboard-button-secondary"
+              >
+                Отмена
+              </button>
+            </div>
+          </Modal>
+        ) : null}
+
+        {showClearModal ? (
+          <Modal title="Очистить завершённые заявки" text="Это действие нельзя отменить.">
+            <div className="dashboard-modal-actions">
+              <button
+                type="button"
+                onClick={clearCompletedTickets}
+                disabled={actionLoading === "clear-completed"}
+                className="dashboard-button dashboard-button-danger"
+              >
+                {actionLoading === "clear-completed" ? "Очистка..." : "Очистить"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowClearModal(false)}
+                disabled={actionLoading === "clear-completed"}
+                className="dashboard-button dashboard-button-secondary"
+              >
+                Отмена
+              </button>
+            </div>
+          </Modal>
+        ) : null}
+
+        {showDirectorPasswordModal ? (
+          <Modal title="Сменить пароль директора">
+            <input
+              type="password"
+              placeholder="Новый пароль директора"
+              value={directorNewPassword}
+              onChange={(e) => setDirectorNewPassword(e.target.value)}
+              disabled={actionLoading === "change-director-password"}
+              className="dashboard-input"
+            />
+            <div className="dashboard-modal-actions">
+              <button
+                type="button"
+                onClick={changeDirectorPassword}
+                disabled={actionLoading === "change-director-password"}
+                className="dashboard-button dashboard-button-primary"
+              >
+                {actionLoading === "change-director-password" ? "Сохранение..." : "Сохранить"}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowDirectorPasswordModal(false)}
+                disabled={actionLoading === "change-director-password"}
+                className="dashboard-button dashboard-button-secondary"
+              >
+                Отмена
+              </button>
+            </div>
+          </Modal>
+        ) : null}
       </div>
-
-      {showAddModal && (
-        <Modal>
-          <h3 style={modalTitle}>Add Admin</h3>
-          <input type="email" placeholder="Email" value={newAdminEmail} onChange={(e) => setNewAdminEmail(e.target.value)} disabled={actionLoading === "add-admin"} style={input} />
-          <input type="password" placeholder="Password" value={newAdminPassword} onChange={(e) => setNewAdminPassword(e.target.value)} disabled={actionLoading === "add-admin"} style={input} />
-          <button onClick={addAdmin} disabled={actionLoading === "add-admin"} style={{ ...modalButtonPrimary, ...(actionLoading === "add-admin" ? disabledButton : {}) }}>{actionLoading === "add-admin" ? "Creating..." : "Create"}</button>
-          <button onClick={() => setShowAddModal(false)} disabled={actionLoading === "add-admin"} style={{ ...modalButtonSecondary, ...(actionLoading === "add-admin" ? disabledButton : {}) }}>Cancel</button>
-        </Modal>
-      )}
-
-      {showChangeModal && (
-        <Modal>
-          <h3 style={modalTitle}>Change Admin Password</h3>
-          <input type="password" placeholder="New password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} disabled={actionLoading === "change-admin-password"} style={input} />
-          <button onClick={changePassword} disabled={actionLoading === "change-admin-password"} style={{ ...modalButtonPrimary, ...(actionLoading === "change-admin-password" ? disabledButton : {}) }}>{actionLoading === "change-admin-password" ? "Saving..." : "Save"}</button>
-          <button onClick={() => setShowChangeModal(false)} disabled={actionLoading === "change-admin-password"} style={{ ...modalButtonSecondary, ...(actionLoading === "change-admin-password" ? disabledButton : {}) }}>Cancel</button>
-        </Modal>
-      )}
-
-      {showDeleteModal && (
-        <Modal>
-          <h3 style={modalTitle}>Delete Admin</h3>
-          <p style={modalText}>{selectedEmail}</p>
-          <button onClick={deleteAdmin} disabled={actionLoading === "delete-admin"} style={{ ...modalButtonPrimary, ...(actionLoading === "delete-admin" ? disabledButton : {}) }}>{actionLoading === "delete-admin" ? "Deleting..." : "Delete"}</button>
-          <button onClick={() => setShowDeleteModal(false)} disabled={actionLoading === "delete-admin"} style={{ ...modalButtonSecondary, ...(actionLoading === "delete-admin" ? disabledButton : {}) }}>Cancel</button>
-        </Modal>
-      )}
-
-      {showClearModal && (
-        <Modal>
-          <h3 style={modalTitle}>Clear Completed Tickets</h3>
-          <p style={modalText}>This action cannot be undone.</p>
-          <button onClick={clearCompletedTickets} disabled={actionLoading === "clear-completed"} style={{ ...modalButtonPrimary, ...(actionLoading === "clear-completed" ? disabledButton : {}) }}>{actionLoading === "clear-completed" ? "Clearing..." : "Clear"}</button>
-          <button onClick={() => setShowClearModal(false)} disabled={actionLoading === "clear-completed"} style={{ ...modalButtonSecondary, ...(actionLoading === "clear-completed" ? disabledButton : {}) }}>Cancel</button>
-        </Modal>
-      )}
-
-      {showDirectorPasswordModal && (
-        <Modal>
-          <h3 style={modalTitle}>Change Director Password</h3>
-          <input type="password" placeholder="New director password" value={directorNewPassword} onChange={(e) => setDirectorNewPassword(e.target.value)} disabled={actionLoading === "change-director-password"} style={input} />
-          <button onClick={changeDirectorPassword} disabled={actionLoading === "change-director-password"} style={{ ...modalButtonPrimary, ...(actionLoading === "change-director-password" ? disabledButton : {}) }}>{actionLoading === "change-director-password" ? "Saving..." : "Save"}</button>
-          <button onClick={() => setShowDirectorPasswordModal(false)} disabled={actionLoading === "change-director-password"} style={{ ...modalButtonSecondary, ...(actionLoading === "change-director-password" ? disabledButton : {}) }}>Cancel</button>
-        </Modal>
-      )}
     </div>
   );
 }
-
-const container = {
-  padding: 40,
-  backgroundColor: "#0a0a0a",
-  color: "#e0e0e0",
-  fontFamily: "system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",
-  minHeight: "100vh",
-};
-
-const title = {
-  fontSize: "2rem",
-  marginBottom: "1.5rem",
-  borderBottom: "2px solid #333",
-  display: "inline-block",
-  paddingBottom: 8,
-  color: "#ffffff",
-};
-
-const topGrid = {
-  display: "grid",
-  gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-  gap: "1.5rem",
-  marginBottom: "2rem",
-};
-
-const twoColumns = { display: "flex", gap: "2rem", flexWrap: "wrap", alignItems: "flex-start" };
-const leftColumn = { flex: "1", minWidth: "300px" };
-const rightColumn = { flex: "1.5", minWidth: "350px" };
-const panel = { border: "1px solid #2a2a2a", padding: 20, borderRadius: 10, backgroundColor: "#111111" };
-const ticketsList = { maxHeight: "calc(100vh - 180px)", overflowY: "auto", paddingRight: "8px" };
-const subtitle = { fontSize: "1.5rem", margin: "0 0 1rem 0", color: "#dddddd" };
-const card = { border: "1px solid #2a2a2a", padding: 16, marginBottom: 16, borderRadius: 8, backgroundColor: "#111111", boxShadow: "0 2px 4px rgba(0,0,0,0.3)" };
-const listCard = { border: "1px solid #2a2a2a", padding: 12, marginBottom: 12, borderRadius: 8, backgroundColor: "#151515" };
-const cardText = { margin: "8px 0", color: "#cccccc", lineHeight: 1.4, wordBreak: "break-word" };
-const mutedText = { margin: "4px 0", color: "#8f8f8f", fontSize: "0.9rem", wordBreak: "break-word" };
-const cardActions = { display: "flex", gap: "10px", marginTop: 12 };
-const buttonGroup = { display: "flex", flexWrap: "wrap", gap: "12px", marginTop: 20 };
-const filtersRow = { display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 12 };
-const paginationStyle = { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginTop: 12 };
-const buttonPrimary = { padding: "10px 20px", backgroundColor: "#2c2c2c", color: "#ffffff", border: "1px solid #444", borderRadius: 6, cursor: "pointer", fontWeight: 500 };
-const buttonSecondary = { padding: "10px 20px", backgroundColor: "#1f1f1f", color: "#e0e0e0", border: "1px solid #333", borderRadius: 6, cursor: "pointer", fontWeight: 500 };
-const toggleButton = { background: "none", border: "none", color: "#9ca3af", cursor: "pointer", marginLeft: 8, fontSize: "0.9rem", textDecoration: "underline" };
-const emptyMessage = { color: "#888", textAlign: "center", padding: "1rem 0" };
-const modalBg = { position: "fixed", top: 0, left: 0, width: "100%", height: "100%", backgroundColor: "rgba(0,0,0,0.85)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 9999 };
-const modalBox = { backgroundColor: "#1a1a1a", padding: 30, borderRadius: 12, width: 400, maxWidth: "90%", boxShadow: "0 10px 25px rgba(0,0,0,0.5)", border: "1px solid #333" };
-const modalTitle = { marginTop: 0, marginBottom: 20, color: "#ffffff", fontSize: "1.5rem" };
-const modalText = { marginBottom: 20, color: "#cccccc" };
-const input = { width: "100%", padding: "10px 12px", marginBottom: 16, border: "1px solid #444", borderRadius: 6, fontSize: "1rem", boxSizing: "border-box", backgroundColor: "#2a2a2a", color: "#ffffff" };
-const modalButtonPrimary = { width: "100%", padding: "10px 15px", backgroundColor: "#2c2c2c", color: "#ffffff", border: "1px solid #555", borderRadius: 6, marginTop: 8, cursor: "pointer", fontWeight: 500 };
-const modalButtonSecondary = { width: "100%", padding: "10px 15px", backgroundColor: "#222", color: "#cccccc", border: "1px solid #444", borderRadius: 6, marginTop: 12, cursor: "pointer", fontWeight: 500 };
-const disabledButton = { opacity: 0.65, cursor: "not-allowed" };
