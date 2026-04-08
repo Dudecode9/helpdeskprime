@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { apiFetch } from "../lib/api";
+import { hasMedia, mediaLibrary } from "../lib/media";
 import { validateLoginForm } from "../utils/validation";
+import "./HomePage.css";
 
 function getErrorMessage(error) {
   const validationError = error?.data?.errors?.[0]?.message;
-  return validationError || error?.message || "Login failed";
+  return validationError || error?.message || "Не удалось выполнить вход";
 }
 
 export default function AdminLogin() {
@@ -16,11 +18,20 @@ export default function AdminLogin() {
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
   const { user, loading, refreshAuth } = useAuth();
+  const loginMedia = mediaLibrary.publicPages.login;
 
   useEffect(() => {
-    if (loading) return;
-    if (user?.role === "director") navigate("/director-dashboard", { replace: true });
-    if (user?.role === "admin") navigate("/admin-dashboard", { replace: true });
+    if (loading) {
+      return;
+    }
+
+    if (user?.role === "director") {
+      navigate("/director-dashboard", { replace: true });
+    }
+
+    if (user?.role === "admin") {
+      navigate("/admin-dashboard", { replace: true });
+    }
   }, [loading, navigate, user]);
 
   async function handleLogin(e) {
@@ -50,140 +61,78 @@ export default function AdminLogin() {
   }
 
   return (
-    <div style={pageStyle}>
-      <div style={brandStyle}>HelpDesk</div>
-      <h2 style={titleStyle}>Admin Login</h2>
+    <div className="public-page">
+      <div className="public-layout">
+        <div className="public-topbar">
+          <Link to="/" className="public-back-link">
+            ← Вернуться на главную
+          </Link>
+          <div className="header-note">Сохраняем текущую схему авторизации и обновляем только визуальную подачу</div>
+        </div>
 
-      <form onSubmit={handleLogin} style={formStyle}>
-        <label style={labelStyle}>Email</label>
-        <input
-          type="email"
-          maxLength={255}
-          placeholder="Enter admin email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={submitting}
-          style={inputStyle}
-        />
+        <section className="public-panel">
+          <div className="public-panel-grid">
+            <aside className="public-aside">
+              {hasMedia(loginMedia.url) ? <img src={loginMedia.url} alt={loginMedia.alt} /> : null}
+              <div className="public-aside-content">
+                <span className="eyebrow">Служебный доступ</span>
+                <h2>Вход для сотрудников и администрации</h2>
+                <p>
+                  Экран авторизации выдержан в том же официальном стиле, что и главная. Чисто, спокойно и без перегруза, чтобы не мешать рабочему сценарию входа.
+                </p>
+              </div>
+            </aside>
 
-        <label style={labelStyle}>Password</label>
-        <input
-          type="password"
-          maxLength={72}
-          placeholder="Enter password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          disabled={submitting}
-          style={inputStyle}
-        />
+            <div className="public-content">
+              <h2>Авторизация</h2>
+              <p>
+                Используйте рабочие учётные данные для входа. Логика проверки, входа, обновления сессии и редиректов сохраняется полностью.
+              </p>
 
-        {error && <p style={errorStyle}>{error}</p>}
+              <form onSubmit={handleLogin} className="public-form">
+                <div className="form-row">
+                  <label htmlFor="admin-email">Электронная почта</label>
+                  <input
+                    id="admin-email"
+                    type="email"
+                    maxLength={255}
+                    placeholder="Введите рабочий email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={submitting}
+                    className="form-input"
+                  />
+                </div>
 
-        <button type="submit" disabled={submitting} style={{ ...primaryButtonStyle, ...(submitting ? disabledButtonStyle : {}) }}>
-          {submitting ? "Signing In..." : "Sign In"}
-        </button>
+                <div className="form-row">
+                  <label htmlFor="admin-password">Пароль</label>
+                  <input
+                    id="admin-password"
+                    type="password"
+                    maxLength={72}
+                    placeholder="Введите пароль"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={submitting}
+                    className="form-input"
+                  />
+                </div>
 
-        <button onClick={() => navigate("/")} type="button" disabled={submitting} style={{ ...secondaryButtonStyle, ...(submitting ? disabledButtonStyle : {}) }}>
-          Back
-        </button>
-      </form>
+                {error ? <div className="form-message error">{error}</div> : null}
+
+                <div className="form-actions">
+                  <button type="submit" disabled={submitting} className="primary-button">
+                    {submitting ? "Выполняется вход..." : "Войти"}
+                  </button>
+                  <button type="button" onClick={() => navigate("/")} disabled={submitting} className="secondary-button">
+                    Назад
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
-
-const pageStyle = {
-  padding: 40,
-  maxWidth: 450,
-  margin: "0 auto",
-  background: "#0f0f0f",
-  minHeight: "100vh",
-  color: "white",
-  fontFamily: "Poppins, sans-serif",
-};
-
-const brandStyle = {
-  background: "#1a1a1a",
-  color: "white",
-  padding: "18px 20px",
-  borderRadius: 12,
-  textAlign: "center",
-  fontSize: 30,
-  fontWeight: "bold",
-  marginBottom: 35,
-  boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
-  border: "1px solid #333",
-  fontFamily: "Oswald, sans-serif",
-  letterSpacing: "2px",
-  textTransform: "uppercase",
-};
-
-const titleStyle = {
-  textAlign: "center",
-  marginBottom: 25,
-  fontFamily: "Oswald, sans-serif",
-  fontSize: 26,
-  letterSpacing: "1px",
-  color: "#d00000",
-};
-
-const formStyle = {
-  background: "#1a1a1a",
-  padding: 25,
-  borderRadius: 12,
-  boxShadow: "0 4px 15px rgba(0,0,0,0.5)",
-  border: "1px solid #333",
-};
-
-const labelStyle = { fontWeight: "600", fontSize: 15 };
-
-const inputStyle = {
-  width: "100%",
-  padding: 12,
-  marginTop: 6,
-  marginBottom: 18,
-  borderRadius: 8,
-  border: "1px solid #333",
-  background: "#111",
-  color: "white",
-  fontSize: 16,
-};
-
-const errorStyle = {
-  color: "#ff4d4d",
-  marginBottom: 10,
-  fontWeight: "bold",
-  fontSize: 14,
-};
-
-const primaryButtonStyle = {
-  width: "100%",
-  padding: "12px 0",
-  background: "#d00000",
-  color: "white",
-  borderRadius: 8,
-  cursor: "pointer",
-  border: "none",
-  fontSize: 18,
-  fontFamily: "Oswald, sans-serif",
-  letterSpacing: "1px",
-  textTransform: "uppercase",
-  transition: "0.2s",
-};
-
-const secondaryButtonStyle = {
-  width: "100%",
-  padding: "10px 0",
-  background: "#333",
-  color: "white",
-  borderRadius: 8,
-  cursor: "pointer",
-  border: "none",
-  fontSize: 16,
-  marginTop: 20,
-  fontFamily: "Poppins, sans-serif",
-};
-
-const disabledButtonStyle = {
-  opacity: 0.65,
-  cursor: "not-allowed",
-};

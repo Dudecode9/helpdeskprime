@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { apiFetch } from "../lib/api";
+import { hasMedia, mediaLibrary } from "../lib/media";
 import { validateTicketForm } from "../utils/validation";
+import "./HomePage.css";
 
 function getErrorMessage(error) {
   const validationError = error?.data?.errors?.[0]?.message;
-  return validationError || error?.message || "Request failed";
+  return validationError || error?.message || "Не удалось отправить заявку";
 }
 
 export default function UserPage() {
@@ -16,6 +18,7 @@ export default function UserPage() {
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
+  const requestMedia = mediaLibrary.publicPages.request;
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -39,7 +42,7 @@ export default function UserPage() {
         },
         skipRefresh: true,
       });
-      setSuccess("Ticket submitted successfully.");
+      setSuccess("Заявка успешно отправлена. Мы свяжемся с вами после уточнения деталей.");
       setEmail("");
       setPhone("");
       setMessage("");
@@ -51,171 +54,92 @@ export default function UserPage() {
   }
 
   return (
-    <div style={pageStyle}>
-      <div style={brandStyle}>HelpDesk Portal</div>
-      <h2 style={titleStyle}>Submit Ticket</h2>
+    <div className="public-page">
+      <div className="public-layout">
+        <div className="public-topbar">
+          <Link to="/" className="public-back-link">
+            ← Вернуться на главную
+          </Link>
+          <div className="header-note">Сохраняем текущую логику формы и обновляем только внешний слой</div>
+        </div>
 
-      <form onSubmit={handleSubmit} style={formStyle}>
-        <label style={labelStyle}>Email</label>
-        <input
-          type="email"
-          maxLength={255}
-          placeholder="Enter your email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          disabled={submitting}
-          style={inputStyle}
-        />
+        <section className="public-panel">
+          <div className="public-panel-grid">
+            <aside className="public-aside">
+              {hasMedia(requestMedia.url) ? <img src={requestMedia.url} alt={requestMedia.alt} /> : null}
+              <div className="public-aside-content">
+                <span className="eyebrow">Приём заявок</span>
+                <h1>Оставьте заявку на консультацию или расчёт</h1>
+                <p>
+                  Спокойная деловая форма без лишнего визуального шума. Пользователь понимает, что сделать дальше, а функционал отправки остаётся прежним.
+                </p>
+              </div>
+            </aside>
 
-        <label style={labelStyle}>Phone</label>
-        <input
-          type="text"
-          maxLength={30}
-          placeholder="Enter your phone number"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          disabled={submitting}
-          style={inputStyle}
-        />
+            <div className="public-content">
+              <h2>Связаться с нами</h2>
+              <p>
+                Оставьте контакты и кратко опишите задачу. Редизайн не меняет API-запрос, валидацию и маршрут страницы, поэтому бизнес-логика остаётся стабильной.
+              </p>
 
-        <label style={labelStyle}>Message</label>
-        <textarea
-          maxLength={1000}
-          placeholder="Describe the issue in at least 10 characters"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          disabled={submitting}
-          style={textareaStyle}
-        />
+              <form onSubmit={handleSubmit} className="public-form">
+                <div className="form-row">
+                  <label htmlFor="ticket-email">Электронная почта</label>
+                  <input
+                    id="ticket-email"
+                    type="email"
+                    maxLength={255}
+                    placeholder="Например, client@example.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={submitting}
+                    className="form-input"
+                  />
+                </div>
 
-        <button type="submit" disabled={submitting} style={{ ...primaryButtonStyle, ...(submitting ? disabledButtonStyle : {}) }}>
-          {submitting ? "Submitting..." : "Submit"}
-        </button>
+                <div className="form-row">
+                  <label htmlFor="ticket-phone">Телефон</label>
+                  <input
+                    id="ticket-phone"
+                    type="text"
+                    maxLength={30}
+                    placeholder="Укажите номер для связи"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    disabled={submitting}
+                    className="form-input"
+                  />
+                </div>
 
-        {success && <p style={successStyle}>{success}</p>}
-        {error && <p style={errorStyle}>{error}</p>}
+                <div className="form-row">
+                  <label htmlFor="ticket-message">Описание задачи</label>
+                  <textarea
+                    id="ticket-message"
+                    maxLength={1000}
+                    placeholder="Кратко опишите задачу, чтобы мы быстрее сориентировались"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    disabled={submitting}
+                    className="form-textarea"
+                  />
+                </div>
 
-        <button onClick={() => navigate("/")} type="button" disabled={submitting} style={{ ...secondaryButtonStyle, ...(submitting ? disabledButtonStyle : {}) }}>
-          Back
-        </button>
-      </form>
+                {success ? <div className="form-message success">{success}</div> : null}
+                {error ? <div className="form-message error">{error}</div> : null}
+
+                <div className="form-actions">
+                  <button type="submit" disabled={submitting} className="primary-button">
+                    {submitting ? "Отправка..." : "Отправить заявку"}
+                  </button>
+                  <button type="button" onClick={() => navigate("/")} disabled={submitting} className="secondary-button">
+                    Назад
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
-
-const pageStyle = {
-  padding: 40,
-  maxWidth: 500,
-  margin: "0 auto",
-  fontFamily: "Poppins, sans-serif",
-  background: "#0f0f0f",
-  minHeight: "100vh",
-  color: "white",
-};
-
-const brandStyle = {
-  background: "#1a1a1a",
-  color: "white",
-  padding: "18px 20px",
-  borderRadius: 12,
-  textAlign: "center",
-  fontSize: 30,
-  fontWeight: "bold",
-  marginBottom: 35,
-  boxShadow: "0 0 25px rgba(255,0,0,0.25)",
-  border: "1px solid #333",
-  fontFamily: "Oswald, sans-serif",
-  letterSpacing: "2px",
-  textTransform: "uppercase",
-};
-
-const titleStyle = {
-  textAlign: "center",
-  marginBottom: 25,
-  fontFamily: "Oswald, sans-serif",
-  fontSize: 26,
-  letterSpacing: "1px",
-  color: "#d00000",
-};
-
-const formStyle = {
-  background: "#1a1a1a",
-  padding: 25,
-  borderRadius: 12,
-  boxShadow: "0 4px 15px rgba(0,0,0,0.5)",
-  border: "1px solid #333",
-};
-
-const labelStyle = { fontWeight: 600 };
-
-const inputStyle = {
-  width: "100%",
-  padding: 12,
-  marginTop: 6,
-  marginBottom: 18,
-  borderRadius: 8,
-  border: "1px solid #333",
-  background: "#111",
-  color: "white",
-  fontSize: 16,
-};
-
-const textareaStyle = {
-  width: "100%",
-  padding: 12,
-  marginTop: 6,
-  height: 140,
-  borderRadius: 8,
-  border: "1px solid #333",
-  background: "#111",
-  color: "white",
-  fontSize: 16,
-  resize: "none",
-};
-
-const primaryButtonStyle = {
-  width: "100%",
-  padding: "12px 0",
-  background: "#d00000",
-  color: "white",
-  borderRadius: 8,
-  cursor: "pointer",
-  border: "none",
-  fontSize: 18,
-  fontFamily: "Oswald, sans-serif",
-  letterSpacing: "1px",
-  textTransform: "uppercase",
-  marginTop: 10,
-};
-
-const secondaryButtonStyle = {
-  width: "100%",
-  padding: "10px 0",
-  background: "#333",
-  color: "white",
-  borderRadius: 8,
-  cursor: "pointer",
-  border: "none",
-  fontSize: 16,
-  marginTop: 20,
-  fontFamily: "Poppins, sans-serif",
-};
-
-const successStyle = {
-  color: "#4ade80",
-  marginTop: 15,
-  fontWeight: "bold",
-  fontSize: 14,
-};
-
-const errorStyle = {
-  color: "#ff6b6b",
-  marginTop: 15,
-  fontWeight: "bold",
-  fontSize: 14,
-};
-
-const disabledButtonStyle = {
-  opacity: 0.65,
-  cursor: "not-allowed",
-};
