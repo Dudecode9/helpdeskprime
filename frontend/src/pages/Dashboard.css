@@ -75,7 +75,7 @@
 .dashboard-stat,
 .dashboard-log {
   border: 1px solid var(--line);
-  background: rgba(255, 252, 247, 0.88);
+  background: rgba(255, 251, 246, 0.94);
   box-shadow: var(--shadow-soft);
   backdrop-filter: blur(12px);
 }
@@ -98,8 +98,8 @@
 }
 
 .dashboard-panel-dark {
-  background: rgba(31, 29, 26, 0.86);
-  border-color: rgba(247, 239, 227, 0.12);
+  background: linear-gradient(180deg, rgba(42, 31, 22, 0.96), rgba(28, 22, 18, 0.96));
+  border-color: rgba(255, 231, 205, 0.16);
   color: var(--text-on-dark);
 }
 
@@ -116,6 +116,7 @@
   font-family: var(--font-heading);
   font-size: 1.35rem;
   line-height: 1.12;
+  color: var(--text-primary);
 }
 
 .dashboard-row {
@@ -138,7 +139,7 @@
   padding: 12px 14px;
   border-radius: 14px;
   border: 1px solid rgba(74, 55, 38, 0.16);
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.94);
   color: var(--text-primary);
   font: inherit;
 }
@@ -158,8 +159,8 @@
 
 .dashboard-panel-dark .dashboard-input,
 .dashboard-panel-dark .dashboard-select {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(247, 239, 227, 0.14);
+  background: rgba(255, 248, 240, 0.1);
+  border-color: rgba(255, 231, 205, 0.18);
   color: var(--text-on-dark);
 }
 
@@ -187,7 +188,7 @@
 }
 
 .dashboard-button-secondary {
-  background: rgba(255, 252, 247, 0.72);
+  background: rgba(255, 252, 247, 0.9);
   border-color: var(--line-strong);
   color: var(--text-primary);
 }
@@ -198,9 +199,9 @@
 }
 
 .dashboard-button-soft {
-  background: rgba(74, 55, 38, 0.08);
-  color: var(--text-primary);
-  border-color: rgba(74, 55, 38, 0.08);
+  background: rgba(181, 106, 47, 0.12);
+  color: #6f3d16;
+  border-color: rgba(181, 106, 47, 0.16);
 }
 
 .dashboard-button:disabled {
@@ -215,6 +216,21 @@
 .dashboard-log,
 .dashboard-stat {
   padding: 18px;
+}
+
+.dashboard-panel:not(.dashboard-panel-dark) .dashboard-ticket,
+.dashboard-panel:not(.dashboard-panel-dark) .dashboard-card,
+.dashboard-panel:not(.dashboard-panel-dark) .dashboard-log,
+.dashboard-panel:not(.dashboard-panel-dark) .dashboard-stat {
+  background: #fffdf9;
+  border-color: rgba(107, 80, 53, 0.12);
+}
+
+.dashboard-panel-dark .dashboard-ticket,
+.dashboard-panel-dark .dashboard-card,
+.dashboard-panel-dark .dashboard-log {
+  background: rgba(255, 248, 240, 0.06);
+  border-color: rgba(255, 231, 205, 0.1);
 }
 
 .dashboard-ticket + .dashboard-ticket,
@@ -241,13 +257,13 @@
 
 .dashboard-text {
   margin: 8px 0 0;
-  color: var(--text-secondary);
+  color: #55473c;
   line-height: 1.65;
   word-break: break-word;
 }
 
 .dashboard-inline-label {
-  color: var(--text-secondary);
+  color: #6f5f52;
   font-weight: 600;
 }
 
@@ -265,13 +281,13 @@
 }
 
 .dashboard-badge-active {
-  background: rgba(74, 55, 38, 0.08);
-  color: #5d4b3d;
+  background: rgba(78, 104, 84, 0.14);
+  color: #31553f;
 }
 
 .dashboard-badge-progress {
-  background: rgba(181, 106, 47, 0.18);
-  color: #8f4f1f;
+  background: rgba(181, 106, 47, 0.22);
+  color: #844616;
 }
 
 .dashboard-badge-success {
@@ -328,11 +344,11 @@
 .dashboard-empty {
   margin: 0;
   padding: 16px 0;
-  color: var(--text-secondary);
+  color: #76685c;
 }
 
 .dashboard-muted {
-  color: var(--text-secondary);
+  color: #6f6155;
 }
 
 .dashboard-pagination {
@@ -402,7 +418,7 @@
 .dashboard-divider {
   height: 1px;
   margin: 18px 0;
-  background: var(--line);
+  background: rgba(255, 231, 205, 0.16);
 }
 
 .dashboard-scroll {
@@ -418,6 +434,26 @@
   background: rgba(190, 57, 44, 0.12);
   color: #9b3428;
   font-weight: 600;
+}
+
+.dashboard-panel-dark .dashboard-empty,
+.dashboard-panel-dark .dashboard-muted,
+.dashboard-panel-dark .dashboard-caption,
+.dashboard-panel-dark .dashboard-text,
+.dashboard-panel-dark .dashboard-inline-label {
+  color: rgba(247, 239, 227, 0.82);
+}
+
+.dashboard-panel-dark .dashboard-button-soft {
+  background: rgba(255, 214, 176, 0.1);
+  color: #ffd9b3;
+  border-color: rgba(255, 214, 176, 0.12);
+}
+
+.dashboard-panel-dark .dashboard-button-secondary {
+  background: rgba(255, 248, 240, 0.1);
+  color: #fff3e5;
+  border-color: rgba(255, 231, 205, 0.16);
 }
 
 @media (max-width: 1100px) {
