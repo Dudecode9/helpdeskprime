@@ -4,6 +4,7 @@ pipeline {
   options {
     timestamps()
     disableConcurrentBuilds()
+    skipDefaultCheckout(true)
   }
 
   environment {
@@ -14,6 +15,7 @@ pipeline {
     stage('Checkout') {
       steps {
         checkout scm
+        sh 'cp .env.example .env'
       }
     }
 
@@ -63,6 +65,7 @@ pipeline {
     always {
       sh 'docker compose logs --tail=100 || true'
       sh 'docker compose down -v || true'
+      sh 'rm -f .env || true'
       archiveArtifacts artifacts: 'frontend/dist/**', allowEmptyArchive: true
     }
   }

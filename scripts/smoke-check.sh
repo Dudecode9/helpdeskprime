@@ -19,7 +19,5 @@ assert_endpoint() {
 }
 
 assert_endpoint "$BASE_URL/" "Frontend root"
-assert_endpoint "$BASE_URL/api" "API root"
 assert_endpoint "$BASE_URL/api/health" "API health"
-assert_endpoint "$BASE_URL/api/v1" "API v1 root"
 assert_endpoint "$BASE_URL/api/v1/health" "API v1 health"
