@@ -1,25 +1,38 @@
 import {
   registerDirector,
   loginDirector,
-  updateDirectorPassword
+  updateDirectorPassword,
 } from "../services/directorService.js";
+import { createAuditLog } from "../services/auditLogService.js";
+import { getRequestMeta } from "../utils/requestContext.js";
 
-// Регистрация директора
 export async function directorRegister(req, res) {
-  const { email, password } = req.body;
+  const { email, password } = req.validated?.body || req.body;
+  const { ip, userAgent } = getRequestMeta(req);
 
   try {
     const director = await registerDirector(email, password);
+    await createAuditLog({
+      category: "audit",
+      eventType: "director.created",
+      actorUserId: req.user?.id,
+      actorEmail: req.user?.email,
+      actorRole: req.user?.role,
+      targetType: "director",
+      targetId: String(director.id),
+      status: "success",
+      message: `Director ${director.email} created`,
+      ip,
+      userAgent,
+    });
     res.json({ success: true, director });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ success: false, message: "Failed to register director" });
   }
 }
 
-// Вход директора
 export async function directorLogin(req, res) {
-  const { email, password } = req.body;
+  const { email, password } = req.validated?.body || req.body;
 
   try {
     const director = await loginDirector(email, password);
@@ -29,14 +42,13 @@ export async function directorLogin(req, res) {
 
     res.json({ success: true, director });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ success: false, message: "Login failed" });
   }
 }
 
-// 🔥 Смена пароля директора
 export async function changeDirectorPassword(req, res) {
-  const { newPassword } = req.body;
+  const { newPassword } = req.validated?.body || req.body;
+  const { ip, userAgent } = getRequestMeta(req);
 
   try {
     const director = await updateDirectorPassword(newPassword);
@@ -45,9 +57,22 @@ export async function changeDirectorPassword(req, res) {
       return res.json({ success: false, message: "Director not found" });
     }
 
+    await createAuditLog({
+      category: "audit",
+      eventType: "director.password.changed",
+      actorUserId: req.user?.id,
+      actorEmail: req.user?.email,
+      actorRole: req.user?.role,
+      targetType: "director",
+      targetId: String(director.id),
+      status: "success",
+      message: `Director password changed for ${director.email}`,
+      ip,
+      userAgent,
+    });
+
     res.json({ success: true, director });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ success: false, message: "Password update failed" });
   }
 }

@@ -17,24 +17,13 @@ export async function createAdmin(email, password) {
 
 // Авторизация администратора
 export async function loginAdmin(email, password) {
-  const result = await pool.query(
-    "SELECT * FROM admins WHERE email = $1",
-    [email]
-  );
+  const admin = await verifyAdminCredentials(email, password);
 
-  if (result.rows.length === 0) {
-    throw new Error("Admin not found");
+  if (!admin) {
+    throw new Error("Invalid email or password");
   }
 
-  const admin = result.rows[0];
-
-  const isMatch = await bcrypt.compare(password, admin.password);
-
-  if (!isMatch) {
-    throw new Error("Invalid password");
-  }
-
-  return { id: admin.id, email: admin.email };
+  return admin;
 }
 
 // Получить всех админов
@@ -43,6 +32,29 @@ export async function getAllAdmins() {
     "SELECT id, email FROM admins ORDER BY id ASC"
   );
   return result.rows;
+}
+
+export async function findAdminByEmail(email) {
+  const result = await pool.query(
+    "SELECT id, email, password FROM admins WHERE email = $1",
+    [email]
+  );
+
+  return result.rows[0] || null;
+}
+
+export async function verifyAdminCredentials(email, password) {
+  const admin = await findAdminByEmail(email);
+  if (!admin) {
+    return null;
+  }
+
+  const isMatch = await bcrypt.compare(password, admin.password);
+  if (!isMatch) {
+    return null;
+  }
+
+  return { id: admin.id, email: admin.email };
 }
 
 // Обновить пароль админа

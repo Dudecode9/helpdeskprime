@@ -1,0 +1,11 @@
+.env
+.env.local
+.env.*.local
+!.env.example
+
+node_modules/
+dist/
+db/backups/*.sql
+infra/certs/*
+!infra/certs/.gitkeep
+ops/monitoring/*.log

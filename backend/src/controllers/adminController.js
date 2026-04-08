@@ -3,12 +3,13 @@ import {
   loginAdmin,
   getAllAdmins,
   updateAdminPassword,
-  deleteAdmin
+  deleteAdmin,
 } from "../services/adminService.js";
+import { createAuditLog } from "../services/auditLogService.js";
+import { getRequestMeta } from "../utils/requestContext.js";
 
-// ЛОГИН АДМИНА
 export async function adminLogin(req, res) {
-  const { email, password } = req.body;
+  const { email, password } = req.validated?.body || req.body;
 
   try {
     const admin = await loginAdmin(email, password);
@@ -18,58 +19,98 @@ export async function adminLogin(req, res) {
   }
 }
 
-// СОЗДАНИЕ АДМИНА (директор)
 export async function registerAdmin(req, res) {
-  const { email, password } = req.body;
+  const { email, password } = req.validated?.body || req.body;
+  const { ip, userAgent } = getRequestMeta(req);
 
   try {
     const admin = await createAdmin(email, password);
+    await createAuditLog({
+      category: "audit",
+      eventType: "admin.created",
+      actorUserId: req.user?.id,
+      actorEmail: req.user?.email,
+      actorRole: req.user?.role,
+      targetType: "admin",
+      targetId: String(admin.id),
+      status: "success",
+      message: `Admin ${admin.email} created`,
+      ip,
+      userAgent,
+    });
     res.json({ success: true, admin });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Ошибка создания админа" });
+    res.status(500).json({ success: false, message: "Failed to create admin" });
   }
 }
 
-// ПОЛУЧИТЬ ВСЕХ АДМИНОВ
 export async function getAdmins(req, res) {
   try {
     const admins = await getAllAdmins();
     res.json({ success: true, admins });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Ошибка получения админов" });
+    res.status(500).json({ success: false, message: "Failed to load admins" });
   }
 }
 
-// ИЗМЕНИТЬ ПАРОЛЬ АДМИНА
 export async function changeAdminPassword(req, res) {
-  const { email, newPassword } = req.body;
+  const { email, newPassword } = req.validated?.body || req.body;
+  const { ip, userAgent } = getRequestMeta(req);
 
   try {
     const admin = await updateAdminPassword(email, newPassword);
 
     if (!admin) {
-      return res.json({ success: false, message: "Админ не найден" });
+      return res.json({ success: false, message: "Admin not found" });
     }
+
+    await createAuditLog({
+      category: "audit",
+      eventType: "admin.password.changed",
+      actorUserId: req.user?.id,
+      actorEmail: req.user?.email,
+      actorRole: req.user?.role,
+      targetType: "admin",
+      targetId: String(admin.id),
+      status: "success",
+      message: `Password changed for admin ${admin.email}`,
+      ip,
+      userAgent,
+    });
 
     res.json({ success: true, admin });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Ошибка обновления пароля" });
+    res.status(500).json({ success: false, message: "Failed to update admin password" });
   }
 }
 
-// 🔥 УДАЛИТЬ АДМИНА
 export async function deleteAdminController(req, res) {
-  const { email } = req.body;
+  const { email } = req.validated?.body || req.body;
+  const { ip, userAgent } = getRequestMeta(req);
 
   try {
     const deleted = await deleteAdmin(email);
 
     if (!deleted) {
-      return res.json({ success: false, message: "Админ не найден" });
+      return res.json({ success: false, message: "Admin not found" });
     }
+
+    await createAuditLog({
+      category: "audit",
+      eventType: "admin.deleted",
+      actorUserId: req.user?.id,
+      actorEmail: req.user?.email,
+      actorRole: req.user?.role,
+      targetType: "admin",
+      targetId: String(deleted.id),
+      status: "success",
+      message: `Admin ${deleted.email} deleted`,
+      ip,
+      userAgent,
+    });
 
     res.json({ success: true, deleted });
   } catch (err) {
-    res.status(500).json({ success: false, message: "Ошибка удаления админа" });
+    res.status(500).json({ success: false, message: "Failed to delete admin" });
   }
 }

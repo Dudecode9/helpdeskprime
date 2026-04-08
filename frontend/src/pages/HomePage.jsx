@@ -1,24 +1,32 @@
-import { Link } from "react-router-dom";
+import { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext";
 import "./HomePage.css";
 
 export default function HomePage() {
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (loading || !user) {
+      return;
+    }
+
+    navigate(user.role === "director" ? "/director-dashboard" : "/admin-dashboard", {
+      replace: true,
+    });
+  }, [loading, navigate, user]);
+
   return (
     <div className="home-container">
-
-      {/* Шапка */}
       <div className="header">HelpDesk Portal</div>
-
-      {/* Подзаголовок */}
-      <h1 className="title glitch">Выбор режима доступа</h1>
-
-      {/* Кнопки */}
+      <h1 className="title glitch">Select Access Mode</h1>
       <div className="button-group">
         <Link to="/user" className="home-btn user-btn">
-          Пользователь
+          User
         </Link>
-
         <Link to="/admin-login" className="home-btn admin-btn">
-          Администратор
+          Staff Login
         </Link>
       </div>
     </div>
