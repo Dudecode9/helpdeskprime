@@ -4,7 +4,7 @@ import { useAuth } from "../auth/AuthContext";
 import { apiFetch } from "../lib/api";
 import { validateLoginForm } from "../utils/validation";
 
-function TicketCard({ ticket, showClose, onClose, onStart }) {
+function TicketCard({ ticket, showClose, onClose, onStart, isStarting, isClosing }) {
   const [expanded, setExpanded] = useState(false);
   const statusLabel = ticket.status === "in_progress" ? "In Progress" : "Active";
   const statusColors = ticket.status === "in_progress" ? statusBadgeProgress : statusBadgeActive;
@@ -28,13 +28,13 @@ function TicketCard({ ticket, showClose, onClose, onStart }) {
           Copy
         </button>
         {showClose && ticket.status !== "in_progress" && (
-          <button onClick={onStart} style={smallButtonStyle}>
-            Start
+          <button onClick={onStart} disabled={isStarting || isClosing} style={{ ...smallButtonStyle, ...((isStarting || isClosing) ? disabledButtonStyle : {}) }}>
+            {isStarting ? "Starting..." : "Start"}
           </button>
         )}
         {showClose && (
-          <button onClick={onClose} style={{ ...smallButtonStyle, marginLeft: "auto", background: "#d00000" }}>
-            Close
+          <button onClick={onClose} disabled={isStarting || isClosing} style={{ ...smallButtonStyle, marginLeft: "auto", background: "#d00000", ...((isStarting || isClosing) ? disabledButtonStyle : {}) }}>
+            {isClosing ? "Closing..." : "Close"}
           </button>
         )}
       </div>
@@ -75,6 +75,7 @@ export default function AdminDashboard() {
   const [directorEmail, setDirectorEmail] = useState("");
   const [directorPassword, setDirectorPassword] = useState("");
   const [directorError, setDirectorError] = useState("");
+  const [actionLoading, setActionLoading] = useState("");
 
   useEffect(() => {
     loadTickets(1, activeEmailFilter, activeStatusFilter);
@@ -125,27 +126,37 @@ export default function AdminDashboard() {
   }
 
   async function startTicket(id) {
-    const data = await apiFetch(`/api/tickets/start/${id}`, {
-      method: "POST",
-      body: {},
-    });
+    setActionLoading(`start-${id}`);
+    try {
+      const data = await apiFetch(`/api/tickets/start/${id}`, {
+        method: "POST",
+        body: {},
+      });
 
-    if (data.success) {
-      await loadTickets(activeMeta.page, activeEmailFilter, activeStatusFilter);
+      if (data.success) {
+        await loadTickets(activeMeta.page, activeEmailFilter, activeStatusFilter);
+      }
+    } finally {
+      setActionLoading("");
     }
   }
 
   async function closeTicket(id) {
-    const data = await apiFetch(`/api/tickets/close/${id}`, {
-      method: "POST",
-      body: {},
-    });
+    setActionLoading(`close-${id}`);
+    try {
+      const data = await apiFetch(`/api/tickets/close/${id}`, {
+        method: "POST",
+        body: {},
+      });
 
-    if (data.success) {
-      await Promise.all([
-        loadTickets(activeMeta.page, activeEmailFilter, activeStatusFilter),
-        loadCompleted(1, completedEmailFilter),
-      ]);
+      if (data.success) {
+        await Promise.all([
+          loadTickets(activeMeta.page, activeEmailFilter, activeStatusFilter),
+          loadCompleted(1, completedEmailFilter),
+        ]);
+      }
+    } finally {
+      setActionLoading("");
     }
   }
 
@@ -159,6 +170,7 @@ export default function AdminDashboard() {
     }
 
     try {
+      setActionLoading("director-login");
       await apiFetch("/api/auth/login/director", {
         method: "POST",
         body: { email: directorEmail.trim(), password: directorPassword },
@@ -169,6 +181,8 @@ export default function AdminDashboard() {
       navigate("/director-dashboard");
     } catch (error) {
       setDirectorError(getErrorMessage(error));
+    } finally {
+      setActionLoading("");
     }
   }
 
@@ -233,6 +247,8 @@ export default function AdminDashboard() {
             key={ticket.id}
             ticket={ticket}
             showClose
+            isStarting={actionLoading === `start-${ticket.id}`}
+            isClosing={actionLoading === `close-${ticket.id}`}
             onStart={() => startTicket(ticket.id)}
             onClose={() => closeTicket(ticket.id)}
           />
@@ -253,6 +269,7 @@ export default function AdminDashboard() {
               placeholder="Director email"
               value={directorEmail}
               onChange={(e) => setDirectorEmail(e.target.value)}
+              disabled={actionLoading === "director-login"}
               style={inputStyle}
             />
             <input
@@ -260,12 +277,13 @@ export default function AdminDashboard() {
               placeholder="Director password"
               value={directorPassword}
               onChange={(e) => setDirectorPassword(e.target.value)}
+              disabled={actionLoading === "director-login"}
               style={inputStyle}
             />
             {directorError && <p style={{ color: "#ff6b6b" }}>{directorError}</p>}
             <div style={{ display: "flex", gap: 10 }}>
-              <button onClick={handleDirectorLogin} style={logoutButtonStyle}>Sign In</button>
-              <button onClick={() => setShowDirectorModal(false)} style={smallButtonStyle}>Cancel</button>
+              <button onClick={handleDirectorLogin} disabled={actionLoading === "director-login"} style={{ ...logoutButtonStyle, ...(actionLoading === "director-login" ? disabledButtonStyle : {}) }}>{actionLoading === "director-login" ? "Signing In..." : "Sign In"}</button>
+              <button onClick={() => setShowDirectorModal(false)} disabled={actionLoading === "director-login"} style={{ ...smallButtonStyle, ...(actionLoading === "director-login" ? disabledButtonStyle : {}) }}>Cancel</button>
             </div>
           </div>
         </div>
@@ -398,4 +416,9 @@ const inputStyle = {
   background: "#111",
   color: "white",
   marginBottom: 10,
+};
+
+const disabledButtonStyle = {
+  opacity: 0.65,
+  cursor: "not-allowed",
 };

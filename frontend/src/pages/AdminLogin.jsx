@@ -13,6 +13,7 @@ export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
   const { user, loading, refreshAuth } = useAuth();
 
@@ -33,6 +34,7 @@ export default function AdminLogin() {
     }
 
     try {
+      setSubmitting(true);
       await apiFetch("/api/auth/login/admin", {
         method: "POST",
         body: { email: email.trim(), password },
@@ -42,6 +44,8 @@ export default function AdminLogin() {
       navigate("/admin-dashboard", { replace: true });
     } catch (loginError) {
       setError(getErrorMessage(loginError));
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -58,6 +62,7 @@ export default function AdminLogin() {
           placeholder="Enter admin email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          disabled={submitting}
           style={inputStyle}
         />
 
@@ -68,16 +73,17 @@ export default function AdminLogin() {
           placeholder="Enter password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          disabled={submitting}
           style={inputStyle}
         />
 
         {error && <p style={errorStyle}>{error}</p>}
 
-        <button type="submit" style={primaryButtonStyle}>
-          Sign In
+        <button type="submit" disabled={submitting} style={{ ...primaryButtonStyle, ...(submitting ? disabledButtonStyle : {}) }}>
+          {submitting ? "Signing In..." : "Sign In"}
         </button>
 
-        <button onClick={() => navigate("/")} type="button" style={secondaryButtonStyle}>
+        <button onClick={() => navigate("/")} type="button" disabled={submitting} style={{ ...secondaryButtonStyle, ...(submitting ? disabledButtonStyle : {}) }}>
           Back
         </button>
       </form>
@@ -175,4 +181,9 @@ const secondaryButtonStyle = {
   fontSize: 16,
   marginTop: 20,
   fontFamily: "Poppins, sans-serif",
+};
+
+const disabledButtonStyle = {
+  opacity: 0.65,
+  cursor: "not-allowed",
 };

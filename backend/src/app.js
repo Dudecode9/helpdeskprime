@@ -8,6 +8,7 @@ import authRoutes from "./routes/authRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import ticketRoutes from "./routes/ticketRoutes.js";
 import directorRoutes from "./routes/directorRoutes.js";
+import apiV1Routes from "./routes/apiV1Routes.js";
 import { getAllowedOrigins } from "./config/auth.js";
 import { getHealth } from "./controllers/healthController.js";
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
@@ -37,7 +38,21 @@ app.use(express.json());
 app.use(requestLogger);
 app.use(verifyOrigin);
 
+app.get("/api", (req, res) => {
+  res.json({
+    success: true,
+    message: "Help Desk API",
+    versions: ["v1"],
+    latest: "/api/v1",
+    legacy: {
+      supported: true,
+      health: "/api/health",
+    },
+  });
+});
+
 app.get("/api/health", getHealth);
+app.use("/api/v1", apiV1Routes);
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/tickets", ticketRoutes);

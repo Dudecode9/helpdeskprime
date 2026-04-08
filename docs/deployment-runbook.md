@@ -43,6 +43,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\production-gate.ps1
 - director login works
 - user ticket submission works
 - director dashboard shows online users and activity logs
+- `GET /api/v1/health` returns `ok`
 
 ## 3. Rollback
 
@@ -88,6 +89,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\production-gate.ps1
 
 - Check `docker ps`
 - Check `http://localhost/api/health`
+- Check `http://localhost/api/v1/health`
 - Check backend logs
 - Run `production-gate.ps1`
 - Restore database only if application recovery is not enough

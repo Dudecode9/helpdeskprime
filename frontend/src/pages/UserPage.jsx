@@ -14,6 +14,7 @@ export default function UserPage() {
   const [message, setMessage] = useState("");
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
@@ -28,6 +29,7 @@ export default function UserPage() {
     }
 
     try {
+      setSubmitting(true);
       await apiFetch("/api/tickets/submit", {
         method: "POST",
         body: {
@@ -43,6 +45,8 @@ export default function UserPage() {
       setMessage("");
     } catch (requestError) {
       setError(getErrorMessage(requestError));
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -59,6 +63,7 @@ export default function UserPage() {
           placeholder="Enter your email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          disabled={submitting}
           style={inputStyle}
         />
 
@@ -69,6 +74,7 @@ export default function UserPage() {
           placeholder="Enter your phone number"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
+          disabled={submitting}
           style={inputStyle}
         />
 
@@ -78,17 +84,18 @@ export default function UserPage() {
           placeholder="Describe the issue in at least 10 characters"
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          disabled={submitting}
           style={textareaStyle}
         />
 
-        <button type="submit" style={primaryButtonStyle}>
-          Submit
+        <button type="submit" disabled={submitting} style={{ ...primaryButtonStyle, ...(submitting ? disabledButtonStyle : {}) }}>
+          {submitting ? "Submitting..." : "Submit"}
         </button>
 
         {success && <p style={successStyle}>{success}</p>}
         {error && <p style={errorStyle}>{error}</p>}
 
-        <button onClick={() => navigate("/")} type="button" style={secondaryButtonStyle}>
+        <button onClick={() => navigate("/")} type="button" disabled={submitting} style={{ ...secondaryButtonStyle, ...(submitting ? disabledButtonStyle : {}) }}>
           Back
         </button>
       </form>
@@ -206,4 +213,9 @@ const errorStyle = {
   marginTop: 15,
   fontWeight: "bold",
   fontSize: 14,
+};
+
+const disabledButtonStyle = {
+  opacity: 0.65,
+  cursor: "not-allowed",
 };

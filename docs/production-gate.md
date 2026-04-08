@@ -65,3 +65,5 @@ powershell -ExecutionPolicy Bypass -File .\scripts\start-production.ps1
   - `infra/certs/fullchain.pem`
   - `infra/certs/privkey.pem`
 - for a lightweight production monitoring loop, use `scripts/monitoring-mvp.ps1`
+- the latest versioned health endpoint is `GET /api/v1/health`
+- legacy `/api/...` routes remain available for backward compatibility

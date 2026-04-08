@@ -7,6 +7,7 @@ export async function getHealth(req, res, next) {
     return res.json({
       success: true,
       status: "ok",
+      version: "v1",
       database: "up",
       timestamp: new Date().toISOString(),
     });

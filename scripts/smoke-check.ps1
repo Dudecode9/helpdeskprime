@@ -19,4 +19,7 @@ function Assert-Endpoint {
 }
 
 Assert-Endpoint -Url "$BaseUrl/" -Name "Frontend root"
+Assert-Endpoint -Url "$BaseUrl/api" -Name "API root"
 Assert-Endpoint -Url "$BaseUrl/api/health" -Name "API health"
+Assert-Endpoint -Url "$BaseUrl/api/v1" -Name "API v1 root"
+Assert-Endpoint -Url "$BaseUrl/api/v1/health" -Name "API v1 health"

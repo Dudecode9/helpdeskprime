@@ -66,6 +66,7 @@ export default function DirectorDashboard() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showDirectorPasswordModal, setShowDirectorPasswordModal] = useState(false);
   const [showClearModal, setShowClearModal] = useState(false);
+  const [actionLoading, setActionLoading] = useState("");
 
   useEffect(() => {
     refreshDashboard();
@@ -159,6 +160,7 @@ export default function DirectorDashboard() {
         return;
       }
 
+      setActionLoading("add-admin");
       await apiFetch("/api/admin/create", {
         method: "POST",
         body: { email: newAdminEmail.trim(), password: newAdminPassword },
@@ -170,6 +172,8 @@ export default function DirectorDashboard() {
       await refreshDashboard();
     } catch (requestError) {
       setError(getErrorMessage(requestError));
+    } finally {
+      setActionLoading("");
     }
   }
 
@@ -182,6 +186,7 @@ export default function DirectorDashboard() {
         return;
       }
 
+      setActionLoading("change-admin-password");
       await apiFetch("/api/admin/update-password", {
         method: "POST",
         body: { email: selectedEmail, newPassword },
@@ -192,11 +197,14 @@ export default function DirectorDashboard() {
       await refreshDashboard();
     } catch (requestError) {
       setError(getErrorMessage(requestError));
+    } finally {
+      setActionLoading("");
     }
   }
 
   async function deleteAdmin() {
     try {
+      setActionLoading("delete-admin");
       await apiFetch("/api/admin/delete", {
         method: "POST",
         body: { email: selectedEmail },
@@ -206,11 +214,14 @@ export default function DirectorDashboard() {
       await refreshDashboard();
     } catch (requestError) {
       setError(getErrorMessage(requestError));
+    } finally {
+      setActionLoading("");
     }
   }
 
   async function clearCompletedTickets() {
     try {
+      setActionLoading("clear-completed");
       await apiFetch("/api/tickets/completed/clear", {
         method: "POST",
         body: {},
@@ -220,11 +231,14 @@ export default function DirectorDashboard() {
       await refreshDashboard();
     } catch (requestError) {
       setError(getErrorMessage(requestError));
+    } finally {
+      setActionLoading("");
     }
   }
 
   async function restoreTicket(id) {
     try {
+      setActionLoading(`restore-${id}`);
       await apiFetch(`/api/tickets/completed/restore/${id}`, {
         method: "POST",
         body: {},
@@ -233,6 +247,8 @@ export default function DirectorDashboard() {
       await refreshDashboard();
     } catch (requestError) {
       setError(getErrorMessage(requestError));
+    } finally {
+      setActionLoading("");
     }
   }
 
@@ -245,6 +261,7 @@ export default function DirectorDashboard() {
         return;
       }
 
+      setActionLoading("change-director-password");
       await apiFetch("/api/director/update-password", {
         method: "POST",
         body: { newPassword: directorNewPassword },
@@ -253,6 +270,8 @@ export default function DirectorDashboard() {
       navigate("/admin-login");
     } catch (requestError) {
       setError(getErrorMessage(requestError));
+    } finally {
+      setActionLoading("");
     }
   }
 
@@ -379,7 +398,13 @@ export default function DirectorDashboard() {
                       )}
                     </p>
                     <p style={cardText}><b>Closed by:</b> {ticket.admin_email}</p>
-                    <button onClick={() => restoreTicket(ticket.id)} style={buttonPrimary}>Restore</button>
+                    <button
+                      onClick={() => restoreTicket(ticket.id)}
+                      disabled={actionLoading === `restore-${ticket.id}`}
+                      style={{ ...buttonPrimary, ...(actionLoading === `restore-${ticket.id}` ? disabledButton : {}) }}
+                    >
+                      {actionLoading === `restore-${ticket.id}` ? "Restoring..." : "Restore"}
+                    </button>
                   </div>
                 );
               })
@@ -396,19 +421,19 @@ export default function DirectorDashboard() {
       {showAddModal && (
         <Modal>
           <h3 style={modalTitle}>Add Admin</h3>
-          <input type="email" placeholder="Email" value={newAdminEmail} onChange={(e) => setNewAdminEmail(e.target.value)} style={input} />
-          <input type="password" placeholder="Password" value={newAdminPassword} onChange={(e) => setNewAdminPassword(e.target.value)} style={input} />
-          <button onClick={addAdmin} style={modalButtonPrimary}>Create</button>
-          <button onClick={() => setShowAddModal(false)} style={modalButtonSecondary}>Cancel</button>
+          <input type="email" placeholder="Email" value={newAdminEmail} onChange={(e) => setNewAdminEmail(e.target.value)} disabled={actionLoading === "add-admin"} style={input} />
+          <input type="password" placeholder="Password" value={newAdminPassword} onChange={(e) => setNewAdminPassword(e.target.value)} disabled={actionLoading === "add-admin"} style={input} />
+          <button onClick={addAdmin} disabled={actionLoading === "add-admin"} style={{ ...modalButtonPrimary, ...(actionLoading === "add-admin" ? disabledButton : {}) }}>{actionLoading === "add-admin" ? "Creating..." : "Create"}</button>
+          <button onClick={() => setShowAddModal(false)} disabled={actionLoading === "add-admin"} style={{ ...modalButtonSecondary, ...(actionLoading === "add-admin" ? disabledButton : {}) }}>Cancel</button>
         </Modal>
       )}
 
       {showChangeModal && (
         <Modal>
           <h3 style={modalTitle}>Change Admin Password</h3>
-          <input type="password" placeholder="New password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} style={input} />
-          <button onClick={changePassword} style={modalButtonPrimary}>Save</button>
-          <button onClick={() => setShowChangeModal(false)} style={modalButtonSecondary}>Cancel</button>
+          <input type="password" placeholder="New password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} disabled={actionLoading === "change-admin-password"} style={input} />
+          <button onClick={changePassword} disabled={actionLoading === "change-admin-password"} style={{ ...modalButtonPrimary, ...(actionLoading === "change-admin-password" ? disabledButton : {}) }}>{actionLoading === "change-admin-password" ? "Saving..." : "Save"}</button>
+          <button onClick={() => setShowChangeModal(false)} disabled={actionLoading === "change-admin-password"} style={{ ...modalButtonSecondary, ...(actionLoading === "change-admin-password" ? disabledButton : {}) }}>Cancel</button>
         </Modal>
       )}
 
@@ -416,8 +441,8 @@ export default function DirectorDashboard() {
         <Modal>
           <h3 style={modalTitle}>Delete Admin</h3>
           <p style={modalText}>{selectedEmail}</p>
-          <button onClick={deleteAdmin} style={modalButtonPrimary}>Delete</button>
-          <button onClick={() => setShowDeleteModal(false)} style={modalButtonSecondary}>Cancel</button>
+          <button onClick={deleteAdmin} disabled={actionLoading === "delete-admin"} style={{ ...modalButtonPrimary, ...(actionLoading === "delete-admin" ? disabledButton : {}) }}>{actionLoading === "delete-admin" ? "Deleting..." : "Delete"}</button>
+          <button onClick={() => setShowDeleteModal(false)} disabled={actionLoading === "delete-admin"} style={{ ...modalButtonSecondary, ...(actionLoading === "delete-admin" ? disabledButton : {}) }}>Cancel</button>
         </Modal>
       )}
 
@@ -425,17 +450,17 @@ export default function DirectorDashboard() {
         <Modal>
           <h3 style={modalTitle}>Clear Completed Tickets</h3>
           <p style={modalText}>This action cannot be undone.</p>
-          <button onClick={clearCompletedTickets} style={modalButtonPrimary}>Clear</button>
-          <button onClick={() => setShowClearModal(false)} style={modalButtonSecondary}>Cancel</button>
+          <button onClick={clearCompletedTickets} disabled={actionLoading === "clear-completed"} style={{ ...modalButtonPrimary, ...(actionLoading === "clear-completed" ? disabledButton : {}) }}>{actionLoading === "clear-completed" ? "Clearing..." : "Clear"}</button>
+          <button onClick={() => setShowClearModal(false)} disabled={actionLoading === "clear-completed"} style={{ ...modalButtonSecondary, ...(actionLoading === "clear-completed" ? disabledButton : {}) }}>Cancel</button>
         </Modal>
       )}
 
       {showDirectorPasswordModal && (
         <Modal>
           <h3 style={modalTitle}>Change Director Password</h3>
-          <input type="password" placeholder="New director password" value={directorNewPassword} onChange={(e) => setDirectorNewPassword(e.target.value)} style={input} />
-          <button onClick={changeDirectorPassword} style={modalButtonPrimary}>Save</button>
-          <button onClick={() => setShowDirectorPasswordModal(false)} style={modalButtonSecondary}>Cancel</button>
+          <input type="password" placeholder="New director password" value={directorNewPassword} onChange={(e) => setDirectorNewPassword(e.target.value)} disabled={actionLoading === "change-director-password"} style={input} />
+          <button onClick={changeDirectorPassword} disabled={actionLoading === "change-director-password"} style={{ ...modalButtonPrimary, ...(actionLoading === "change-director-password" ? disabledButton : {}) }}>{actionLoading === "change-director-password" ? "Saving..." : "Save"}</button>
+          <button onClick={() => setShowDirectorPasswordModal(false)} disabled={actionLoading === "change-director-password"} style={{ ...modalButtonSecondary, ...(actionLoading === "change-director-password" ? disabledButton : {}) }}>Cancel</button>
         </Modal>
       )}
     </div>
@@ -491,3 +516,4 @@ const modalText = { marginBottom: 20, color: "#cccccc" };
 const input = { width: "100%", padding: "10px 12px", marginBottom: 16, border: "1px solid #444", borderRadius: 6, fontSize: "1rem", boxSizing: "border-box", backgroundColor: "#2a2a2a", color: "#ffffff" };
 const modalButtonPrimary = { width: "100%", padding: "10px 15px", backgroundColor: "#2c2c2c", color: "#ffffff", border: "1px solid #555", borderRadius: 6, marginTop: 8, cursor: "pointer", fontWeight: 500 };
 const modalButtonSecondary = { width: "100%", padding: "10px 15px", backgroundColor: "#222", color: "#cccccc", border: "1px solid #444", borderRadius: 6, marginTop: 12, cursor: "pointer", fontWeight: 500 };
+const disabledButton = { opacity: 0.65, cursor: "not-allowed" };
