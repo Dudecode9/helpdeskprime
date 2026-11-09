@@ -1,19 +1,22 @@
 :root {
-  color: #221d17;
-  background: #f4efe7;
+  color: #1b2b29;
+  background: #f1f4ef;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-html {
-  scroll-behavior: smooth;
+* {
+  box-sizing: border-box;
 }
 
+html,
 body {
+  min-height: 100%;
   margin: 0;
   min-width: 320px;
+  background: #f1f4ef;
 }
 
 button,
@@ -25,4 +28,10 @@ select {
 
 #root {
   min-height: 100vh;
+}
+
+button,
+input,
+select {
+  font-family: inherit;
 }

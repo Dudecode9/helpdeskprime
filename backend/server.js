@@ -1,15 +1,30 @@
 import app from "./src/app.js";
 import { closePool } from "./src/config/db.js";
+import { startNetworkMonitoring, stopNetworkMonitoring } from "./src/services/networkScheduler.js";
 import { logger } from "./src/utils/logger.js";
 
 const PORT = Number(process.env.PORT || 5000);
+const HOST = process.env.ELECTRON_APP === "true" ? "127.0.0.1" : "0.0.0.0";
 const SHUTDOWN_TIMEOUT_MS = 10_000;
 
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, HOST, () => {
   logger.info("server.started", {
+    host: HOST,
     port: PORT,
     nodeEnv: process.env.NODE_ENV || "development",
   });
+
+  try {
+    startNetworkMonitoring({
+      collectIntervalMs: 1000,
+      flushIntervalMs: 5000,
+    });
+  } catch (error) {
+    logger.error("server.network_monitoring.start.failed", {
+      errorMessage: error.message,
+      stack: process.env.NODE_ENV === "development" ? error.stack : null,
+    });
+  }
 });
 
 let isShuttingDown = false;
@@ -47,6 +62,7 @@ async function shutdown(signal, error = null) {
       });
     });
 
+    await stopNetworkMonitoring();
     await closePool();
 
     clearTimeout(forcedShutdown);

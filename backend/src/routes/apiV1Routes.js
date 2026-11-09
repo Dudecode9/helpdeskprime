@@ -3,6 +3,7 @@ import authRoutes from "./authRoutes.js";
 import adminRoutes from "./adminRoutes.js";
 import ticketRoutes from "./ticketRoutes.js";
 import directorRoutes from "./directorRoutes.js";
+import networkRoutes from "./networkRoutes.js";
 import { getHealth } from "../controllers/healthController.js";
 
 const router = express.Router();
@@ -18,6 +19,7 @@ router.get("/", (req, res) => {
       admin: "/api/v1/admin",
       tickets: "/api/v1/tickets",
       director: "/api/v1/director",
+      network: "/api/v1/network",
     },
   });
 });
@@ -27,5 +29,6 @@ router.use("/auth", authRoutes);
 router.use("/admin", adminRoutes);
 router.use("/tickets", ticketRoutes);
 router.use("/director", directorRoutes);
+router.use("/network", networkRoutes);
 
 export default router;

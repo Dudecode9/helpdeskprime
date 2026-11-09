@@ -1,0 +1,17 @@
+{
+  "name": "helpdeskprime-desktop",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "electron/main.js",
+  "scripts": {
+    "desktop:dev": "ELECTRON_IS_DEV=true electron .",
+    "desktop:check": "node --check electron/main.js && node --check electron/preload.js",
+    "desktop:build": "npm --prefix frontend run build && electron-builder --config electron/electron-builder.config.js --linux AppImage",
+    "desktop:appimage": "electron-builder --config electron/electron-builder.config.js --linux AppImage"
+  },
+  "devDependencies": {
+    "electron": "^31.7.1",
+    "electron-builder": "^24.13.0"
+  }
+}

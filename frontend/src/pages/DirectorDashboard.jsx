@@ -312,6 +312,9 @@ export default function DirectorDashboard() {
             </p>
           </div>
           <div className="dashboard-actions">
+            <button type="button" onClick={() => navigate("/network-dashboard")} className="dashboard-button dashboard-button-secondary">
+              Сетевой монитор
+            </button>
             <button type="button" onClick={refreshDirectorView} className="dashboard-button dashboard-button-soft">
               Обновить данные
             </button>

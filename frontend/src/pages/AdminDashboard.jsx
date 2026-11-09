@@ -252,6 +252,9 @@ export default function AdminDashboard() {
             </p>
           </div>
           <div className="dashboard-actions">
+            <button type="button" onClick={() => navigate("/network-dashboard")} className="dashboard-button dashboard-button-secondary">
+              Сетевой монитор
+            </button>
             <button type="button" onClick={refreshAdminView} className="dashboard-button dashboard-button-soft">
               Обновить данные
             </button>

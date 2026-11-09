@@ -5,15 +5,15 @@ export default function ProtectedRoute({ children, role }) {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return null;
+    return <div className="app-loading">Проверка локальной сессии...</div>;
   }
 
   if (!user) {
-    return <Navigate to="/admin-login" replace />;
+    return <Navigate to="/login" replace />;
   }
 
-  if (role && user.role !== role) {
-    return <Navigate to={user.role === "director" ? "/director-dashboard" : "/admin-dashboard"} replace />;
+  if (role && !(Array.isArray(role) ? role.includes(user.role) : user.role === role)) {
+    return <Navigate to="/login" replace />;
   }
 
   return children;
